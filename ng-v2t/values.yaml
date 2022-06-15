@@ -7,93 +7,87 @@ nameOverride: ""
 fullnameOverride: ""
 
 
-imageCredentials:
-  registry: quay.io
-  username: someone
-  password: sillyness
-  email: someone@host.com
+registry:
+  domain: harbor.newtoncloud.com
+  username: nobody
+  password: node
 
 core:
+  name: core
   image:
-    registry: harbor.newtoncloud.com
-    repository: nginx
+    repository: ng/core
     tag: 0.4.2
-  resources: {}
-  replicas: 1
-  podAnnotations: {}
-  debug: false
-  extraArgs: []
-# extraSecrets
 
-  license: CHANGEME
-  s3:
-    endpoint: http://${BUCKET_HOST}:${BUCKET_PORT}
-    accessKey: ${AWS_SECRET_ACCESS_KEY}
-    secretKey: ${AWS_ACCESS_KEY_ID}
-    s3ForcePathStyle: true
-    insecure: true
-    buckets:
-      history: history
+  replicas: 1
+
+  debug: false
+  extraArgs: [ ]
+
   etcd:
-    endpoint:
-    username:
-    password:
+    hostPort: etcd:2379
+    namespace:
 
-  service:
-    type: ClusterIP
-    port: 80
+  history:
+    dir: /var/lib/ng/history
 
-  tolerations: []
-  affinity: {}
-  nodeSelector: {}
+  workspace:
+    dir: /var/lib/ng/history
 
-dashboard:
-  replicas: 1
-  resources: {}
+  license:
+    token: none
 
+  login:
+    jwtKey: tc287t60daVXjbRRFsxnK67iiO5tghWF
+    adminUsername: ngadmin
+    adminPassword: ngadmin
 
-agent:
-  name: test
-  replicas: 1
-  resources: {}
-  debug: false
+  podAnnotations: { }
+  resources: { }
   tolerations: [ ]
   affinity: { }
   nodeSelector: { }
-  extraArgs: []
+
+dashboard:
+  name: dashboard
+  replicas: 1
   image:
-    registry: harbor.newtoncloud.com
-    repository: nginx
+    repository: ng/dashboard
     tag: 0.4.2
+  podAnnotations: { }
+  resources: { }
+  tolerations: [ ]
+  affinity: { }
+  nodeSelector: { }
 
-
-etcd:
-  enabled: false
-
-
-ceph-bucket:
-  enabled: false
-
-
-
-
-
+agents:
+  name: agent
+  image:
+    repository: ng/v2t-agent
+    tag: 0.4.2
+  replicas: 1
+  resources: { }
+  tolerations: [ ]
+  affinity: { }
+  nodeSelector: { }
+  podAnnotations: { }
 
 
 ingress:
   enabled: false
   className: ""
-  annotations: {}
+  annotations: { }
     # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
+  # kubernetes.io/tls-acme: "true"
   hosts:
     - host: chart-example.local
       paths:
         - path: /
           pathType: ImplementationSpecific
-  tls: []
+  tls: [ ]
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
 
+
+ingressRoute
 
