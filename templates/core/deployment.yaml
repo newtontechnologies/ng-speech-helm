@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ng-v2t.fullname" . }}
+  labels:
+    {{- include "ng-v2t.labels" . | nindent 4 }}
+    component: core
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      {{- include "ng-v2t.selectorLabels" . | nindent 6 }}
+      component: core
+  template:
+    metadata:
+      {{- with .Values.core.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "ng-v2t.selectorLabels" . | nindent 8 }}
+        component: core
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "ng-v2t.serviceAccountName" . }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.registry.domain }}:{{ .Values.core.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          args:
+            - "core"
+            - "--cfg=/etc/ng/core.yml"
+          {{- range .Values.core.extraArgs }}
+            - {{ . }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: 8080
+            - name: grpc
+              containerPort: 8081
+            - name: monitor
+              containerPort: 8082
+          volumeMounts:
+            - name: cfg
+              mountPath: "/etc/ng"
+              readOnly: true
+            - name: workspace
+              mountPath: {{ ng_workspace_dir }}
+            - name: history
+              mountPath: {{ ng_core_history_dir }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: monitor
+            initialDelaySeconds: 2
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: monitor
+          resources:
+            {{- toYaml .Values.core.resources | nindent 12 }}
+      {{- with .Values.core.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.core.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.core.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
