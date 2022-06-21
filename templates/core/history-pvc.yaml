@@ -1,0 +1,13 @@
+{{ with .Values.core.history }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: "{{ include "ng-v2t.history-pvc" $ }}"
+spec:
+  accessModes:
+    {{- toYaml .accessModes | nindent 4 }}
+  resources:
+    requests:
+      storage: {{ .storageSize }}
+  storageClassName: {{ .storageClassName }}
+{{ end}}

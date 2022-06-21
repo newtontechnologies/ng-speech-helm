@@ -20,3 +20,5 @@ repo/
 __snapshot__
 
 .idea
+
+*.tgz

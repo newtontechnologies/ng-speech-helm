@@ -1,0 +1,13 @@
+{{ with .Values.core.workspace }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: "{{ include "ng-v2t.workspace-pvc" $ }}"
+spec:
+  accessModes:
+    {{- toYaml .accessModes | nindent 4 }}
+  resources:
+    requests:
+      storage: {{ .storageSize }}
+  storageClassName: {{ .storageClassName }}
+{{ end}}

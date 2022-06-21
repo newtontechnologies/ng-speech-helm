@@ -1,0 +1,16 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ include "ng-v2t.dashboard" . }}
+  labels:
+    {{- include "ng-v2t.selectorLabels" . | nindent 4 }}
+    component: dashboard
+spec:
+  ports:
+    - name: http
+      protocol: TCP
+      targetPort: http
+      port: 8080
+  selector:
+    {{- include "ng-v2t.selectorLabels" . | nindent 4 }}
+    component: dashboard

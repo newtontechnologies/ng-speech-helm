@@ -1,57 +1,61 @@
 ---
 
-
 nameOverride: ""
 fullnameOverride: ""
 
-imagePullSecrets: []
+imagePullSecrets: [ ]
 imagePullPolicy: IfNotPresent
 
 registry:
   domain: harbor.newtoncloud.com
-  username: nobody
-  password: node
+  username: ""
+  password: ""
+
+persistence:
+  history:
+    dir: /var/lib/ng/history
+    storageClassName: ""
+    storageSize: 20Gi
+    accessModes:
+      - ReadWriteMany
+  workspace:
+    dir: /var/lib/ng/workspace
+    storageClassName: ""
+    storageSize: 80Gi
+    accessModes:
+      - ReadWriteMany
+
+services: []
 
 core:
   name: core
   image:
     repository: ng/core
   replicas: 1
+  config:
+    etcd:
+      hostPort: etcd:2379
+      namespace: ""
+    history:
+      dir: /var/lib/ng/history
+    workspace:
+      dir: /var/lib/ng/workspace
+    license:
+      token: ""
+    login:
+      jwtKey: ""
+      adminUsername: ngadmin
+      adminPassword: ngadmin
   extraArgs: [ ]
-  etcd:
-    hostPort: etcd:2379
-    namespace: ""
-  history:
-    dir: /var/lib/ng/history
-    persistence:
-      enabled: true
-      storageClassName: ""
-      storageSize: 20Gi
-      accessModes:
-        - ReadWriteMany
-  workspace:
-    dir: /var/lib/ng/workspace
-    persistence:
-      enabled: true
-      storageClassName: ""
-      storageSize: 80Gi
-      accessModes:
-        - ReadWriteMany
-  license:
-    token: ""
-  login:
-    jwtKey: tc287t60daVXjbRRFsxnK67iiO5tghWF
-    adminUsername: ngadmin
-    adminPassword: ngadmin
-
+  extraEnv: { }
+  nodeSelector: { }
   podAnnotations: { }
   resources: { }
   tolerations: [ ]
-  affinity: { }
-  nodeSelector: { }
 
 dashboard:
   name: dashboard
+  pathPrefix: /dashboard
   replicas: 1
   image:
     repository: ng/dashboard
@@ -59,7 +63,6 @@ dashboard:
   podAnnotations: { }
   resources: { }
   tolerations: [ ]
-  affinity: { }
   nodeSelector: { }
 
 agents:
@@ -74,17 +77,40 @@ agents:
   nodeSelector: { }
   podAnnotations: { }
 
-
 ingress:
   enabled: false
-  host: chart-example.local
+
   className: ""
   annotations: { }
-
+  tls:
+    enabled: true
+    secretName: ""
   traefikIngressRoute:
     enabled: false
     entrypoints:
       - websecure
-    tls:
-      secretName: ""
 
+metrics:
+  enabled: false
+  serviceMonitor:
+    enabled: false
+
+catalog:
+  - service: atran-cz-broadcast
+    version: "22.0518.160000"
+  - service: atran-pl-broadcast
+    version: "22.0518.150000"
+  - service: atran-sk-broadcast
+    version: "22.0518.150000"
+  - service: atran-cz-openlex
+    version: "22.0607.200000"
+  - service: atran-us-openlex
+    version: "22.0607.200000"
+  - service: atran-sk-openlex
+    version: "22.0607.200000"
+  - service: vad-default
+    version: "22.0607.200000"
+  - service: diar-default
+    version: "22.0607.200000"
+  - service: adsp-vprint-v3
+    version: "22.0607.200000"

@@ -1,0 +1,49 @@
+{{- if .Values.ingress.traefikIngressRoute.enabled }}
+kind: IngressRoute
+apiVersion: traefik.containo.us/v1alpha1
+metadata:
+  name: core
+spec:
+  entryPoints:
+    {{- toYaml .Values.ingress.traefikIngressRoute.entrypoints | nindent 4 }}
+  routes:
+{{- if $.Values.ingress.host}}
+    - kind: Rule
+      match: {{ print "Host(`{{ $.Values.ingress.host }}`)" "&&" "PathPrefix(`/`)" }}
+      services:
+        - name: {{ include "ng-v2t.core" . }}
+          port: http
+    - kind: Rule
+      match: {{ print "Host(`{{ $.Values.ingress.host }}`)" "&&" "Headers(`Content-Type`,`application/grpc`)" }}
+      services:
+        - name: {{ include "ng-v2t.core" . }}
+          port: grpc
+          scheme: h2c
+    - kind: Rule
+      match: {{ print "Host(`{{ $.Values.ingress.host }}`)" "&&" "PathPrefix(`{{ $.Values.dashboard.pathPrefix }}`)" }}
+      services:
+        - name: {{ include "ng-v2t.dashboard" . }}-dashboard
+          port: http
+{{ else}}
+    - kind: Rule
+      match: PathPrefix(`/`)
+      services:
+        - name: {{ include "ng-v2t.core" . }}
+          port: http
+    - kind: Rule
+      match: Headers(`Content-Type`,`application/grpc`)
+      services:
+        - name: {{ include "ng-v2t.core" . }}
+          port: grpc
+          scheme: h2c
+    - kind: Rule
+      match: PathPrefix(`{{ $.Values.dashboard.pathPrefix }}`)
+      services:
+        - name: {{ include "ng-v2t.dashboard" . }}
+          port: http
+{{- end}}
+{{- if .Values.ingress.tls.enabled}}
+  tls:
+    secretName: {{ .Values.ingress.tls.secretName }}
+{{- end }}
+{{- end }}

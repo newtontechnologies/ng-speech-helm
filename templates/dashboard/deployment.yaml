@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "ng-v2t.core" . }}
+  name: {{ include "ng-v2t.dashboard" . }}
   labels:
     {{- include "ng-v2t.labels" . | nindent 4 }}
-    component: core
+    component: dashboard
 spec:
   replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
       {{- include "ng-v2t.selectorLabels" . | nindent 6 }}
-      component: core
+      component: dashboard
   template:
     metadata:
       {{- with .Values.core.podAnnotations }}
@@ -19,7 +19,7 @@ spec:
       {{- end }}
       labels:
         {{- include "ng-v2t.selectorLabels" . | nindent 8 }}
-        component: core
+        component: dashboard
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -28,33 +28,19 @@ spec:
       serviceAccountName: {{ include "ng-v2t.serviceAccountName" . }}
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.registry.domain }}:{{ .Values.core.image.tag | default .Chart.AppVersion }}"
+          image: "{{ .Values.registry.domain }}:{{ .Values.dashboard.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.imagePullPolicy }}
-          args:
-            - "core"
-            - "--cfg=/etc/ng/core.yml"
-          {{- range .Values.core.extraArgs }}
-            - {{ . }}
-          {{- end }}
           ports:
             - name: http
-              containerPort: 8080
-            - name: grpc
-              containerPort: 8081
-            - name: monitor
-              containerPort: 8082
-          {{- with .Values.core.extraEnv }}
+              containerPort: 80
           env:
+            - name: PATH_PREFIX
+              value: "{{ .Values.dashboard.pathPrefix }}"
+            - name: CLUSTER_NAME
+              value: {{ include "ng-v2t.name" }}
+          {{- with .Values.core.extraEnv }}
               {{- toYaml . | nindent 12 }}
           {{- end }}
-          volumeMounts:
-            - name: cfg
-              mountPath: "/etc/ng"
-              readOnly: true
-            - name: workspace
-              mountPath: {{ .Values.core.workspace.dir }}
-            - name: history
-              mountPath: {{ .Values.core.history.dir }}
           livenessProbe:
             httpGet:
               path: /health
@@ -70,16 +56,6 @@ spec:
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      volumes:
-        - name: cfg
-          secret:
-            secretName: {{ include "ng-v2t.core-cfg" . }}
-        - name: workspace
-          persistentVolumeClaim:
-            claimName: {{ include "ng-v2t.workspace-pvc" . }}
-        - name: history
-          persistentVolumeClaim:
-            claimName: {{ include "ng-v2t.history-pvc" . }}
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -89,7 +65,7 @@ spec:
                     - key: component
                       operator: In
                       values:
-                        - core
+                        - dashboard
                 topologyKey: "kubernetes.io/hostname"
                 namespaces:
                   - {{ .Release.Namespace }}

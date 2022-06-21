@@ -60,3 +60,41 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+
+{{/*
+Create chart name and version as used by the chart label.
+*/}}
+{{- define "ng-v2t.chart" -}}
+{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
+
+{{- define "ng-v2t.core" -}}
+{{- printf "%s-core" (include "ng-v2t.fullname" .) -}}
+{{- end -}}
+
+
+{{- define "ng-v2t.core-cfg" -}}
+{{- printf "%s-core" (include "ng-v2t.fullname" .) -}}
+{{- end -}}
+
+{{- define "ng-v2t.dashboard" -}}
+{{- printf "%s-core" (include "ng-v2t.fullname" .) -}}
+{{- end -}}
+
+
+{{- define "ng-v2t.history-pvc" -}}
+{{- printf "%s-history" (include "ng-v2t.fullname" .) -}}
+{{- end -}}
+
+
+{{- define "ng-v2t.workspace-pvc" -}}
+{{- printf "%s-workspace" (include "ng-v2t.fullname" .) -}}
+{{- end -}}
+
+
+{{- define "ng-v2t.traefik-host-prefix" -}}
+{{- if $.Values.ingress.host}}{{- printf "Host(`%s`) &&" $.Values.ingress.host }}{{- end}}
+{{- end -}}
+
