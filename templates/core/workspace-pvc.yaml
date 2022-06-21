@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: "{{ include "ng-v2t.workspace-pvc" $ }}"
+  name: "{{ include "ng-v2t.workspacePvc" $ }}"
 spec:
   accessModes:
     {{- toYaml .accessModes | nindent 4 }}

@@ -3,6 +3,10 @@ kind: IngressRoute
 apiVersion: traefik.containo.us/v1alpha1
 metadata:
   name: core
+  {{- with .Values.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   entryPoints:
     {{- toYaml .Values.ingress.traefikIngressRoute.entrypoints | nindent 4 }}
@@ -22,7 +26,7 @@ spec:
     - kind: Rule
       match: {{ print "Host(`{{ $.Values.ingress.host }}`)" "&&" "PathPrefix(`{{ $.Values.dashboard.pathPrefix }}`)" }}
       services:
-        - name: {{ include "ng-v2t.dashboard" . }}-dashboard
+        - name: {{ include "ng-v2t.dashboard" . }}
           port: http
 {{ else}}
     - kind: Rule

@@ -53,14 +53,18 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "ng-v2t.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create }}
-{{- default (include "ng-v2t.fullname" .) .Values.serviceAccount.name }}
-{{- else }}
-{{- default "default" .Values.serviceAccount.name }}
-{{- end }}
+{{- define "ng-v2t.coreServiceAccountName" -}}
+{{- printf "%s-core" (include "ng-v2t.fullname" .) -}}
 {{- end }}
 
+{{- define "ng-v2t.coreRoleName" -}}
+{{- printf "%s-core-role" (include "ng-v2t.fullname" .) -}}
+{{- end }}
+
+
+{{- define "ng-v2t.coreRoleBindingName" -}}
+{{- printf "%s-core" (include "ng-v2t.fullname" .) -}}
+{{- end }}
 
 {{/*
 Create chart name and version as used by the chart label.
@@ -74,27 +78,33 @@ Create chart name and version as used by the chart label.
 {{- printf "%s-core" (include "ng-v2t.fullname" .) -}}
 {{- end -}}
 
-
-{{- define "ng-v2t.core-cfg" -}}
+{{- define "ng-v2t.coreCfg" -}}
 {{- printf "%s-core" (include "ng-v2t.fullname" .) -}}
 {{- end -}}
+
+{{- define "ng-v2t.agent" -}}
+{{- printf "%s-agent" (include "ng-v2t.fullname" .) -}}
+{{- end -}}
+
 
 {{- define "ng-v2t.dashboard" -}}
 {{- printf "%s-core" (include "ng-v2t.fullname" .) -}}
 {{- end -}}
 
-
-{{- define "ng-v2t.history-pvc" -}}
+{{- define "ng-v2t.historyPvc" -}}
 {{- printf "%s-history" (include "ng-v2t.fullname" .) -}}
 {{- end -}}
 
-
-{{- define "ng-v2t.workspace-pvc" -}}
+{{- define "ng-v2t.workspacePvc" -}}
 {{- printf "%s-workspace" (include "ng-v2t.fullname" .) -}}
 {{- end -}}
 
+{{- define "ng-v2t.imagePullSecret" }}
+{{- printf "%s-image-pull-secret" (include "ng-v2t.fullname" .) -}}
+{{- end }}
 
-{{- define "ng-v2t.traefik-host-prefix" -}}
-{{- if $.Values.ingress.host}}{{- printf "Host(`%s`) &&" $.Values.ingress.host }}{{- end}}
-{{- end -}}
-
+{{- define "ng-v2t.imagePullSecretBody" }}
+{{- with .Values.registry }}
+{{- printf "{\"auths\":{\"%s\":{\"username\":\"%s\",\"password\":\"%s\",\"email\":\"%s\",\"auth\":\"%s\"}}}" .registry .username .password .email (printf "%s:%s" .username .password | b64enc) | b64enc }}
+{{- end }}
+{{- end }}

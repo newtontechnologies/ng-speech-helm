@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "ng-v2t.dashboard" . }}
+  name: {{ include "ng-v2t.agent" . }}
   labels:
     {{- include "ng-v2t.labels" . | nindent 4 }}
-    component: dashboard
+    component: agent
 spec:
   replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
       {{- include "ng-v2t.selectorLabels" . | nindent 6 }}
-      component: dashboard
+      component: agent
   template:
     metadata:
       {{- with .Values.core.podAnnotations }}
@@ -26,20 +26,25 @@ spec:
       {{- with .Values.imagePullSecrets }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      terminationGracePeriodSeconds: {{ .Values.agent.terminationGracePeriodSeconds }}
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.registry.domain }}:{{ .Values.dashboard.image.tag | default .Chart.AppVersion }}"
+          image: "{{ .Values.registry.domain }}:{{ .Values.agent.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.imagePullPolicy }}
           ports:
-            - name: http
-              containerPort: 80
+            - name: monitor
+              containerPort: 8080
+            - name: grpc-api
+              containerPort: 8081
+          args:
+            - "agent"
+            - "--workspace-dir={{ .Values.core.workspace.dir }}"
+          {{- with .Values.agent.extraArgs }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.agent.extraEnv }}
           env:
-            - name: PATH_PREFIX
-              value: "{{ .Values.dashboard.pathPrefix }}"
-            - name: CLUSTER_NAME
-              value: {{ include "ng-v2t.name" }}
-          {{- with .Values.core.extraEnv }}
-              {{- toYaml . | nindent 12 }}
+            {{- toYaml . | nindent 12 }}
           {{- end }}
           livenessProbe:
             httpGet:
@@ -52,25 +57,19 @@ spec:
               port: monitor
           resources:
             {{- toYaml .Values.core.resources | nindent 12 }}
+          volumeMounts:
+            - name: workspace
+              mountPath: {{ .Values.core.workspace.dir }}
+              readOnly: true
       {{- with .Values.core.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      affinity:
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - podAffinityTerm:
-                labelSelector:
-                  matchExpressions:
-                    - key: component
-                      operator: In
-                      values:
-                        - dashboard
-                topologyKey: "kubernetes.io/hostname"
-                namespaces:
-                  - {{ .Release.Namespace }}
-              weight: 1
       {{- with .Values.core.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      volumes:
+        - name: workspace
+          persistentVolumeClaim:
+            claimName: {{ include "ng-v2t.workspacePvc" . }}

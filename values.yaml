@@ -10,6 +10,7 @@ registry:
   domain: harbor.newtoncloud.com
   username: ""
   password: ""
+  email: ""
 
 persistence:
   history:
@@ -25,36 +26,53 @@ persistence:
     accessModes:
       - ReadWriteMany
 
-services: []
-
 core:
-  name: core
   image:
     repository: ng/core
   replicas: 1
-  config:
+  license:
+    token: ""
+  login:
+    jwtKey: ""
+    jwtAudience: ""
+    adminUsername: ngadmin
+    adminPassword: ngadmin
+  history:
+    dir: /var/lib/ng/history
+  workspace:
+    dir: /var/lib/ng/workspace
+  etcd:
+    hostPort: etcd:2379
+    namespace: ""
+    username: ""
+    password: ""
+  config: |
     etcd:
-      hostPort: etcd:2379
-      namespace: ""
+      {{- toYaml .Values.etcd | nindent 2 }}
     history:
-      dir: /var/lib/ng/history
+     {{- toYaml .Values.history | nindent 2 }}
     workspace:
-      dir: /var/lib/ng/workspace
+      {{- toYaml .Values.workspace | nindent 2 }}
     license:
-      token: ""
+      {{- toYaml .Values.license | nindent 2 }}
     login:
-      jwtKey: ""
-      adminUsername: ngadmin
-      adminPassword: ngadmin
+      {{- toYaml .Values.login | nindent 2 }}
+    registry:
+       {{- toYaml .Values.registry | nindent 2 }} 
+    services: 
+      static:
+        {{- toYaml (include "ng-v2t.static-services" .) | nindent 4 }}
+  structuredConfig: { }
   extraArgs: [ ]
   extraEnv: { }
   nodeSelector: { }
   podAnnotations: { }
   resources: { }
   tolerations: [ ]
+  services: [ ]
+  terminationGracePeriodSeconds: 600
 
 dashboard:
-  name: dashboard
   pathPrefix: /dashboard
   replicas: 1
   image:
@@ -65,21 +83,22 @@ dashboard:
   tolerations: [ ]
   nodeSelector: { }
 
-agents:
-  name: agent
+agent:
   image:
     repository: ng/v2t-agent
     tag: 0.4.2
   replicas: 1
+  extraArgs: [ ]
+  extraEnv: { }
   resources: { }
   tolerations: [ ]
   affinity: { }
   nodeSelector: { }
   podAnnotations: { }
+  terminationGracePeriodSeconds: 600
 
 ingress:
   enabled: false
-
   className: ""
   annotations: { }
   tls:
