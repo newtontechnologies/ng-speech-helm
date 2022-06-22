@@ -30,9 +30,6 @@ Create chart name and version as used by the chart label.
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
-{{/*
-Common labels
-*/}}
 {{- define "ng-v2t.labels" -}}
 helm.sh/chart: {{ include "ng-v2t.chart" . }}
 {{ include "ng-v2t.selectorLabels" . }}
@@ -42,17 +39,12 @@ app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
-{{/*
-Selector labels
-*/}}
+
 {{- define "ng-v2t.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "ng-v2t.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
-{{/*
-Create the name of the service account to use
-*/}}
 {{- define "ng-v2t.coreServiceAccountName" -}}
 {{- printf "%s-core" (include "ng-v2t.fullname" .) -}}
 {{- end }}
@@ -64,13 +56,6 @@ Create the name of the service account to use
 
 {{- define "ng-v2t.coreRoleBindingName" -}}
 {{- printf "%s-core" (include "ng-v2t.fullname" .) -}}
-{{- end }}
-
-{{/*
-Create chart name and version as used by the chart label.
-*/}}
-{{- define "ng-v2t.chart" -}}
-{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 
@@ -86,9 +71,8 @@ Create chart name and version as used by the chart label.
 {{- printf "%s-agent" (include "ng-v2t.fullname" .) -}}
 {{- end -}}
 
-
 {{- define "ng-v2t.dashboard" -}}
-{{- printf "%s-core" (include "ng-v2t.fullname" .) -}}
+{{- printf "%s-dashboard" (include "ng-v2t.fullname" .) -}}
 {{- end -}}
 
 {{- define "ng-v2t.historyPvc" -}}
@@ -105,6 +89,16 @@ Create chart name and version as used by the chart label.
 
 {{- define "ng-v2t.imagePullSecretBody" }}
 {{- with .Values.registry }}
-{{- printf "{\"auths\":{\"%s\":{\"username\":\"%s\",\"password\":\"%s\",\"email\":\"%s\",\"auth\":\"%s\"}}}" .registry .username .password .email (printf "%s:%s" .username .password | b64enc) | b64enc }}
+{{- printf "{\"auths\":{\"%s\":{\"username\":\"%s\",\"password\":\"%s\",\"email\":\"%s\",\"auth\":\"%s\"}}}" .domain .username .password .email (printf "%s:%s" .username .password | b64enc) | b64enc }}
+{{- end }}
+{{- end }}
+
+
+{{- define "ng-v2t.staticServices" }}
+{{- range $idx, $k := .Values.services }}
+{{- if hasKey $.Values.catalog $k}}
+- service: {{ $k }}
+  version: {{ (get $.Values.catalog $k).version }}
+{{- end }}
 {{- end }}
 {{- end }}

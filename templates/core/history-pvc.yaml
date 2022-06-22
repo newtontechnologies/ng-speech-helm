@@ -1,4 +1,4 @@
-{{ with .Values.core.history }}
+{{ with .Values.persistence.history }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -9,5 +9,5 @@ spec:
   resources:
     requests:
       storage: {{ .storageSize }}
-  storageClassName: {{ .storageClassName }}
+  storageClassName: "{{ default $.Values.persistence.storageClassName .storageClassNam }}"
 {{ end}}

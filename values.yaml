@@ -1,4 +1,3 @@
----
 
 nameOverride: ""
 fullnameOverride: ""
@@ -6,13 +5,37 @@ fullnameOverride: ""
 imagePullSecrets: [ ]
 imagePullPolicy: IfNotPresent
 
+catalog:
+  atran-cz-broadcast:
+    version: "22.0518.160000"
+  atran-pl-broadcast:
+    version: "22.0518.160000"
+  atran-sk-broadcast:
+    version: "22.0518.150000"
+  atran-cz-openlex:
+    version: "22.0607.200000"
+  atran-us-openlex:
+    version: "22.0607.200000"
+  atran-sk-openlex:
+    version: "22.0607.200000"
+  vad-default:
+    version: "22.0607.200000"
+  diar-default:
+    version: "22.0607.200000"
+  adsp-vprint-v3:
+    version: "22.0607.200000"
+
+license:
+  token: ""
+
 registry:
   domain: harbor.newtoncloud.com
   username: ""
   password: ""
-  email: ""
+  email: "user@mail.com"
 
 persistence:
+  storageClassName: ""
   history:
     dir: /var/lib/ng/history
     storageClassName: ""
@@ -30,10 +53,8 @@ core:
   image:
     repository: ng/core
   replicas: 1
-  license:
-    token: ""
   login:
-    jwtKey: ""
+    jwtKey: pXYhbNALrxAhtSZoql548nePJstH22yvZ6zb
     jwtAudience: ""
     adminUsername: ngadmin
     adminPassword: ngadmin
@@ -43,34 +64,35 @@ core:
     dir: /var/lib/ng/workspace
   etcd:
     hostPort: etcd:2379
-    namespace: ""
     username: ""
     password: ""
   config: |
     etcd:
-      {{- toYaml .Values.etcd | nindent 2 }}
+      {{- toYaml .Values.core.etcd | nindent 2 }}
     history:
-     {{- toYaml .Values.history | nindent 2 }}
+      {{- toYaml .Values.core.history | nindent 2 }}
     workspace:
-      {{- toYaml .Values.workspace | nindent 2 }}
+      {{- toYaml .Values.core.workspace | nindent 2 }}
     license:
       {{- toYaml .Values.license | nindent 2 }}
     login:
-      {{- toYaml .Values.login | nindent 2 }}
+      {{- toYaml .Values.core.login | nindent 2 }}
+    pods:    
+      k8s:
+        namespace: {{ .Release.Namespace }}
     registry:
-       {{- toYaml .Values.registry | nindent 2 }} 
-    services: 
+      {{- toYaml .Values.registry | nindent 2 }} 
+    services:      
       static:
-        {{- toYaml (include "ng-v2t.static-services" .) | nindent 4 }}
+    {{- include "ng-v2t.staticServices" .  | indent 4 }}
   structuredConfig: { }
+  terminationGracePeriodSeconds: 600
   extraArgs: [ ]
   extraEnv: { }
   nodeSelector: { }
   podAnnotations: { }
   resources: { }
   tolerations: [ ]
-  services: [ ]
-  terminationGracePeriodSeconds: 600
 
 dashboard:
   pathPrefix: /dashboard
@@ -86,7 +108,6 @@ dashboard:
 agent:
   image:
     repository: ng/v2t-agent
-    tag: 0.4.2
   replicas: 1
   extraArgs: [ ]
   extraEnv: { }
@@ -109,27 +130,5 @@ ingress:
     entrypoints:
       - websecure
 
-metrics:
+serviceMonitor:
   enabled: false
-  serviceMonitor:
-    enabled: false
-
-catalog:
-  - service: atran-cz-broadcast
-    version: "22.0518.160000"
-  - service: atran-pl-broadcast
-    version: "22.0518.150000"
-  - service: atran-sk-broadcast
-    version: "22.0518.150000"
-  - service: atran-cz-openlex
-    version: "22.0607.200000"
-  - service: atran-us-openlex
-    version: "22.0607.200000"
-  - service: atran-sk-openlex
-    version: "22.0607.200000"
-  - service: vad-default
-    version: "22.0607.200000"
-  - service: diar-default
-    version: "22.0607.200000"
-  - service: adsp-vprint-v3
-    version: "22.0607.200000"

@@ -6,7 +6,7 @@ metadata:
     {{- include "ng-v2t.labels" . | nindent 4 }}
     component: dashboard
 spec:
-  replicas: {{ .Values.replicas }}
+  replicas: {{ .Values.dashboard.replicas }}
   selector:
     matchLabels:
       {{- include "ng-v2t.selectorLabels" . | nindent 6 }}
@@ -22,13 +22,13 @@ spec:
         component: dashboard
     spec:
       imagePullSecrets:
-        - {{ include "ng-v2t.imagePullSecret" .}}
+        - name: {{ include "ng-v2t.imagePullSecret" .}}
       {{- with .Values.imagePullSecrets }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.registry.domain }}:{{ .Values.dashboard.image.tag | default .Chart.AppVersion }}"
+          image: "{{ .Values.registry.domain }}/{{ .Values.dashboard.image.repository }}:{{ .Values.dashboard.image.tag  }}"
           imagePullPolicy: {{ .Values.imagePullPolicy }}
           ports:
             - name: http
@@ -37,19 +37,10 @@ spec:
             - name: PATH_PREFIX
               value: "{{ .Values.dashboard.pathPrefix }}"
             - name: CLUSTER_NAME
-              value: {{ include "ng-v2t.name" }}
+              value: {{ include "ng-v2t.name" . }}
           {{- with .Values.core.extraEnv }}
               {{- toYaml . | nindent 12 }}
           {{- end }}
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: monitor
-            initialDelaySeconds: 2
-          readinessProbe:
-            httpGet:
-              path: /health
-              port: monitor
           resources:
             {{- toYaml .Values.core.resources | nindent 12 }}
       {{- with .Values.core.nodeSelector }}

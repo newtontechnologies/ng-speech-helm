@@ -1,0 +1,23 @@
+
+
+services:
+  - atran-cz-openlex
+  - atran-sk-openlex
+
+core:
+  etcd:
+    hostPort: 127.0.0.1:2379
+
+registry:
+  domain: harbor.ite.tul.cz
+  username: "robot$helm"
+  password: "1wFBftMh3O4ALD9T5xyqju2vMIUBJiqp"
+
+persistence:
+  storageClassName: ceph-filesystem
+
+license:
+  token: eyJhbGciOiJFUzM4NCIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJvbmRyZWouc21vbGFAZ21haWwuY29tIiwic3ViIjoidGVzdC1saWNlbnNlIiwiZXhwIjoxNjg3NjUxMjAwLCJuYmYiOjE2NTUyMDE5ODQsImlhdCI6MTY1NTIwMTk4NCwicmVxdWVzdExpbWl0IjoxMDAwLCJhbGxvd0N1c3RvbVNlcnZpY2VzIjp0cnVlfQ.rIHogesGo-lc_PGrVGeR8Awv3YXC4VUpopyFulN6sNb8j3tE1i01Ms7hjUqx9a2DV-Ovwvn_tqlk_-4hxu2QNimAo-1K2Sj5Vij0jV5LZDi3gfP7VNCvYdfKOzJ8g345
+
+serviceMonitor:
+  enabled: true

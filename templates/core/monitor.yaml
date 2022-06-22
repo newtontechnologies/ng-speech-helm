@@ -1,4 +1,4 @@
-{{- if .Values.metrics.enabled and .Values.metrics.serviceMonitor.enabled }}
+{{- if .Values.serviceMonitor.enabled }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
@@ -8,11 +8,11 @@ metadata:
 spec:
   selector:
     matchLabels:
-      {{- include "ng-v2t.selectorLabels" . | nindent 4 }}
+      {{- include "ng-v2t.selectorLabels" . | nindent 6 }}
       component: core
   namespaceSelector:
     matchNames:
-      - "{{ .Release.Namespace}}"
+      - "{{ .Release.Namespace }}"
   endpoints:
     - port: monitor
       path: /metrics

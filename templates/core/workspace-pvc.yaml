@@ -1,4 +1,4 @@
-{{ with .Values.core.workspace }}
+{{ with .Values.persistence.workspace }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -9,5 +9,5 @@ spec:
   resources:
     requests:
       storage: {{ .storageSize }}
-  storageClassName: {{ .storageClassName }}
+  storageClassName: "{{ default $.Values.persistence.storageClassName .storageClassNam }}"
 {{ end}}

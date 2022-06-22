@@ -22,3 +22,5 @@ __snapshot__
 .idea
 
 *.tgz
+
+./test

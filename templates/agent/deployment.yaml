@@ -6,7 +6,7 @@ metadata:
     {{- include "ng-v2t.labels" . | nindent 4 }}
     component: agent
 spec:
-  replicas: {{ .Values.replicas }}
+  replicas: {{ .Values.agent.replicas }}
   selector:
     matchLabels:
       {{- include "ng-v2t.selectorLabels" . | nindent 6 }}
@@ -19,17 +19,17 @@ spec:
       {{- end }}
       labels:
         {{- include "ng-v2t.selectorLabels" . | nindent 8 }}
-        component: dashboard
+        component: agent
     spec:
       imagePullSecrets:
-        - {{ include "ng-v2t.imagePullSecret" .}}
+        - name: {{ include "ng-v2t.imagePullSecret" .}}
       {{- with .Values.imagePullSecrets }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
       terminationGracePeriodSeconds: {{ .Values.agent.terminationGracePeriodSeconds }}
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.registry.domain }}:{{ .Values.agent.image.tag | default .Chart.AppVersion }}"
+          image: "{{ .Values.registry.domain }}/{{ .Values.agent.image.repository }}:{{ .Values.agent.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.imagePullPolicy }}
           ports:
             - name: monitor

@@ -6,9 +6,9 @@ metadata:
     {{- include "ng-v2t.labels" . | nindent 4 }}
     component: core
   annotations:
-    checksum/config: {{ include (print $.Template.BasePath "/core/configmap.yaml") . | sha256sum }}
+    checksum/config: {{ include (print $.Template.BasePath "/core/secret.yaml") . | sha256sum }}
 spec:
-  replicas: {{ .Values.replicas }}
+  replicas: {{ .Values.core.replicas }}
   selector:
     matchLabels:
       {{- include "ng-v2t.selectorLabels" . | nindent 6 }}
@@ -24,7 +24,7 @@ spec:
         component: core
     spec:
       imagePullSecrets:
-        - {{ include "ng-v2t.imagePullSecret" .}}
+        - name: {{ include "ng-v2t.imagePullSecret" .}}
       {{- with .Values.imagePullSecrets }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -32,7 +32,7 @@ spec:
       terminationGracePeriodSeconds: {{ .Values.core.terminationGracePeriodSeconds }}
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.registry.domain }}:{{ .Values.core.image.tag | default .Chart.AppVersion }}"
+          image: "{{ .Values.registry.domain }}/{{ .Values.core.image.repository }}:{{ .Values.core.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.imagePullPolicy }}
           args:
             - "core"
