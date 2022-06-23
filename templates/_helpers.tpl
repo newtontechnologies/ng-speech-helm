@@ -102,3 +102,12 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 {{- end }}
 {{- end }}
+
+
+{{- define "ng-v2t.etcdHostPort" }}
+{{- printf "%s-etcd:2379" .Release.Name -}}
+{{- end }}
+
+{{- define "ng-v2t.etcdPvworkspacePvc" -}}
+{{- printf "%s-workspace" (include "ng-v2t.fullname" .) -}}
+{{- end -}}

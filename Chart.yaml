@@ -2,6 +2,15 @@ apiVersion: v2
 name: ng-v2t
 description: A Helm chart for install Newton Technologies v2t-platform
 type: application
-version: 0.1.0
+version: 0.2.0
 appVersion: "0.5.5"
 icon: https://www.newtontech.net/wp-content/uploads/2022/06/nt-ico-rgb.png
+
+
+dependencies:
+  - name: etcd
+    version: ~8.3.0
+    repository: https://charts.bitnami.com/bitnami
+    condition: etcd.enabled
+    import-values:
+      -

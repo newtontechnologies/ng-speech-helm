@@ -23,4 +23,4 @@ __snapshot__
 
 *.tgz
 
-./test
+test

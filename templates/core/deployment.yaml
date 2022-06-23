@@ -56,9 +56,9 @@ spec:
               mountPath: "/etc/ng"
               readOnly: true
             - name: workspace
-              mountPath: {{ .Values.core.workspace.dir }}
+              mountPath: {{ .Values.core.structuredConfig.workspace.dir }}
             - name: history
-              mountPath: {{ .Values.core.history.dir }}
+              mountPath: {{ .Values.core.structuredConfig.history.dir }}
           livenessProbe:
             httpGet:
               path: /health

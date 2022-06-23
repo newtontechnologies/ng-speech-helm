@@ -1,6 +1,6 @@
 
 DIST_DIR ?= $(CURDIR)/dist
-CHART_DIR ?= $(CURDIR)/traefik
+CHART_DIR ?= $(CURDIR)
 TMPDIR ?= /tmp
 HELM_REPO ?= $(CURDIR)/repo
 LINT_USE_DOCKER ?= true
@@ -16,20 +16,14 @@ test: lint unit-test
 # Execute Static Testing
 lint: lint-requirements
 	@echo "== Linting Chart..."
-	@git remote add traefik https://github.com/traefik/traefik-helm-chart >/dev/null 2>&1 || true
-	@git fetch traefik master >/dev/null 2>&1 || true
+	@git remote add ng-v2t $(PROJECT) >/dev/null 2>&1 || true
+	@git fetch ng-v2t main >/dev/null 2>&1 || true
 ifeq ($(LINT_USE_DOCKER),true)
-	@docker run --rm -t -v $(CURDIR):/charts -w /charts quay.io/helmpack/chart-testing:v3.0.0-beta.2 $(LINT_CMD)
+	@docker run --rm -t -v $(CURDIR):/charts -w /charts quay.io/helmpack/chart-testing:v3.6.0 $(LINT_CMD)
 else
 	cd $(CHART_DIR)/tests && $(LINT_CMD)
 endif
 	@echo "== Linting Finished"
-
-# Execute Unit Testing
-unit-test: helm-unittest
-	@echo "== Unit Testing Chart..."
-	@helm unittest --color --update-snapshot ./traefik
-	@echo "== Unit Tests Finished..."
 
 
 # Generates an artifact containing the Helm Chart in the distribution directory

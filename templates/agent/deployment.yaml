@@ -38,7 +38,7 @@ spec:
               containerPort: 8081
           args:
             - "agent"
-            - "--workspace-dir={{ .Values.core.workspace.dir }}"
+            - "--workspace-dir={{ .Values.core.structuredConfig.workspace.dir }}"
           {{- with .Values.agent.extraArgs }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
@@ -59,7 +59,7 @@ spec:
             {{- toYaml .Values.core.resources | nindent 12 }}
           volumeMounts:
             - name: workspace
-              mountPath: {{ .Values.core.workspace.dir }}
+              mountPath: {{ .Values.core.structuredConfig.workspace.dir }}
               readOnly: true
       {{- with .Values.core.nodeSelector }}
       nodeSelector:

@@ -9,5 +9,5 @@ spec:
   resources:
     requests:
       storage: {{ .storageSize }}
-  storageClassName: "{{ default $.Values.persistence.storageClassName .storageClassNam }}"
+  storageClassName: "{{ default $.Values.persistence.storageClassName .storageClassName }}"
 {{ end}}

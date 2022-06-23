@@ -1,29 +1,8 @@
-
 nameOverride: ""
 fullnameOverride: ""
 
 imagePullSecrets: [ ]
 imagePullPolicy: IfNotPresent
-
-catalog:
-  atran-cz-broadcast:
-    version: "22.0518.160000"
-  atran-pl-broadcast:
-    version: "22.0518.160000"
-  atran-sk-broadcast:
-    version: "22.0518.150000"
-  atran-cz-openlex:
-    version: "22.0607.200000"
-  atran-us-openlex:
-    version: "22.0607.200000"
-  atran-sk-openlex:
-    version: "22.0607.200000"
-  vad-default:
-    version: "22.0607.200000"
-  diar-default:
-    version: "22.0607.200000"
-  adsp-vprint-v3:
-    version: "22.0607.200000"
 
 license:
   token: ""
@@ -48,35 +27,29 @@ persistence:
     storageSize: 80Gi
     accessModes:
       - ReadWriteMany
-
 core:
   image:
     repository: ng/core
+    tag: ""
   replicas: 1
-  login:
-    jwtKey: pXYhbNALrxAhtSZoql548nePJstH22yvZ6zb
-    jwtAudience: ""
-    adminUsername: ngadmin
-    adminPassword: ngadmin
-  history:
-    dir: /var/lib/ng/history
-  workspace:
-    dir: /var/lib/ng/workspace
-  etcd:
-    hostPort: etcd:2379
-    username: ""
-    password: ""
+  structuredConfig:
+    login:
+      jwtKey: pXYhbNALrxAhtSZoql548nePJstH22yvZ6zb
+      jwtAudience: ""
+      adminUsername: ngadmin
+      adminPassword: ngadmin
+    history:
+      dir: /var/lib/ng/history
+    workspace:
+      dir: /var/lib/ng/workspace
+    etcd:
+      username: root
+      password: root
   config: |
     etcd:
-      {{- toYaml .Values.core.etcd | nindent 2 }}
-    history:
-      {{- toYaml .Values.core.history | nindent 2 }}
-    workspace:
-      {{- toYaml .Values.core.workspace | nindent 2 }}
+      hostPort: "{{ template "ng-v2t.etcdHostPort" . }}"   
     license:
       {{- toYaml .Values.license | nindent 2 }}
-    login:
-      {{- toYaml .Values.core.login | nindent 2 }}
     pods:    
       k8s:
         namespace: {{ .Release.Namespace }}
@@ -85,7 +58,6 @@ core:
     services:      
       static:
     {{- include "ng-v2t.staticServices" .  | indent 4 }}
-  structuredConfig: { }
   terminationGracePeriodSeconds: 600
   extraArgs: [ ]
   extraEnv: { }
@@ -108,6 +80,7 @@ dashboard:
 agent:
   image:
     repository: ng/v2t-agent
+    tag: ""
   replicas: 1
   extraArgs: [ ]
   extraEnv: { }
@@ -122,6 +95,7 @@ ingress:
   enabled: false
   className: ""
   annotations: { }
+  host: ""
   tls:
     enabled: true
     secretName: ""
@@ -132,3 +106,51 @@ ingress:
 
 serviceMonitor:
   enabled: false
+
+catalog:
+  atran-cz-broadcast:
+    version: "22.0518.160000"
+  atran-pl-broadcast:
+    version: "22.0518.160000"
+  atran-sk-broadcast:
+    version: "22.0518.150000"
+  atran-cz-openlex:
+    version: "22.0607.200000"
+  atran-us-openlex:
+    version: "22.0607.200000"
+  atran-sk-openlex:
+    version: "22.0607.200000"
+  vad-default:
+    version: "22.0607.200000"
+  diar-default:
+    version: "22.0607.200000"
+  adsp-vprint-v3:
+    version: "22.0607.200000"
+
+etcd:
+  enabled: true
+  localPersistentVolumes:
+    enabled: false
+    nodes: [ ]
+  #    - name: node1
+  #      path: /var/lib/my-etcd
+  extraEnvVars:
+    - name: ETCD_DISABLE_STORE_MEMBER_ID
+      value: "true"
+    - name: ETCD_DISABLE_PRESTOP
+      value: "true"
+  image:
+    registry: harbor.ite.tul.cz
+    repository: library/etcd
+    tag: 3.5.4-no-removal
+  rbac:
+    rootPassword: root
+  resources: { }
+  persistence:
+    storageClass: ""
+  readinessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 12
+

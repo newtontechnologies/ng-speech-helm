@@ -1,0 +1,27 @@
+
+{{- range $i, $v:= .Values.etcdlocalStorage.nodes -}}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: "etcd-pv-{{ index }}"
+  labels:
+    type: etcd
+spec:
+  capacity:
+    storage: "{{ $.Values.etcd.persistence.size }}"
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: "{{ $.Values.etcd.persistence.storageClass }}"
+  local:
+    path: "{{ ng_etcd_local_storage_on_masters_path }}"
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - "{{ $v }}"
+{{ end }}
