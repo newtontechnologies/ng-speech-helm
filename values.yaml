@@ -1,3 +1,4 @@
+---
 nameOverride: ""
 fullnameOverride: ""
 
@@ -11,7 +12,7 @@ registry:
   domain: harbor.newtoncloud.com
   username: ""
   password: ""
-  email: "user@mail.com"
+  email: "nobody@email.com"
 
 persistence:
   storageClassName: ""
@@ -28,10 +29,10 @@ persistence:
     accessModes:
       - ReadWriteMany
 core:
+  replicaCount: 1
   image:
     repository: ng/core
     tag: ""
-  replicas: 1
   structuredConfig:
     login:
       jwtKey: pXYhbNALrxAhtSZoql548nePJstH22yvZ6zb
@@ -44,10 +45,10 @@ core:
       dir: /var/lib/ng/workspace
     etcd:
       username: root
-      password: root
   config: |
     etcd:
-      hostPort: "{{ template "ng-v2t.etcdHostPort" . }}"   
+      hostPort: "{{ template "ng-v2t.etcdHostPort" . }}"      
+      password: "{{ .Values.etcd.rbac.rootPassword }}"      
     license:
       {{- toYaml .Values.license | nindent 2 }}
     pods:    
@@ -67,8 +68,8 @@ core:
   tolerations: [ ]
 
 dashboard:
+  replicaCount: 1
   pathPrefix: /dashboard
-  replicas: 1
   image:
     repository: ng/dashboard
     tag: 0.4.2
@@ -78,10 +79,11 @@ dashboard:
   nodeSelector: { }
 
 agent:
+  replicaCount: 1
   image:
     repository: ng/v2t-agent
     tag: ""
-  replicas: 1
+  terminationGracePeriodSeconds: 600
   extraArgs: [ ]
   extraEnv: { }
   resources: { }
@@ -89,7 +91,6 @@ agent:
   affinity: { }
   nodeSelector: { }
   podAnnotations: { }
-  terminationGracePeriodSeconds: 600
 
 ingress:
   enabled: false
@@ -128,12 +129,14 @@ catalog:
     version: "22.0607.200000"
 
 etcd:
+  replicaCount: 1
   enabled: true
   localPersistentVolumes:
     enabled: false
-    nodes: [ ]
-  #    - name: node1
-  #      path: /var/lib/my-etcd
+    # number of nodes must be >= replicaCount
+    nodes:
+      - name: node1
+        path: /var/lib/my-etcd
   extraEnvVars:
     - name: ETCD_DISABLE_STORE_MEMBER_ID
       value: "true"
@@ -147,10 +150,12 @@ etcd:
     rootPassword: root
   resources: { }
   persistence:
+    # uses empty dir when false
+    enabled: true
     storageClass: ""
   readinessProbe:
     initialDelaySeconds: 5
-    periodSeconds: 10
-    timeoutSeconds: 5
-    failureThreshold: 12
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 20
 

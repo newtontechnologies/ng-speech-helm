@@ -39,7 +39,6 @@ app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
-
 {{- define "ng-v2t.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "ng-v2t.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
@@ -53,11 +52,9 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- printf "%s-core-role" (include "ng-v2t.fullname" .) -}}
 {{- end }}
 
-
 {{- define "ng-v2t.coreRoleBindingName" -}}
 {{- printf "%s-core" (include "ng-v2t.fullname" .) -}}
 {{- end }}
-
 
 {{- define "ng-v2t.core" -}}
 {{- printf "%s-core" (include "ng-v2t.fullname" .) -}}
@@ -93,7 +90,6 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 {{- end }}
 
-
 {{- define "ng-v2t.staticServices" }}
 {{- range $idx, $k := .Values.services }}
 {{- if hasKey $.Values.catalog $k}}
@@ -103,11 +99,11 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 {{- end }}
 
+{{- define "ng-v2t.etcdPvPrefix" }}
+{{- printf "%s-etcd-%s" .Release.Name . -}}
+{{- end }}
 
 {{- define "ng-v2t.etcdHostPort" }}
 {{- printf "%s-etcd:2379" .Release.Name -}}
 {{- end }}
 
-{{- define "ng-v2t.etcdPvworkspacePvc" -}}
-{{- printf "%s-workspace" (include "ng-v2t.fullname" .) -}}
-{{- end -}}

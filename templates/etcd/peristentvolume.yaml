@@ -1,11 +1,11 @@
-
-{{- range $i, $v:= .Values.etcdlocalStorage.nodes -}}
+{{- if .Values.etcd.localPersistentVolumes.enabled }}
+{{- range $i, $v:= .Values.etcd.localPersistentVolumes.nodes -}}
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: "etcd-pv-{{ index }}"
+  name: "{{ include "ng-v2t.etcdPvPrefix" $i }}"
   labels:
-    type: etcd
+    {{- include "ng-v2t.labels" . | nindent 4 }}
 spec:
   capacity:
     storage: "{{ $.Values.etcd.persistence.size }}"
@@ -15,7 +15,7 @@ spec:
   persistentVolumeReclaimPolicy: Delete
   storageClassName: "{{ $.Values.etcd.persistence.storageClass }}"
   local:
-    path: "{{ ng_etcd_local_storage_on_masters_path }}"
+    path: "{{ $v.path }}"
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -23,5 +23,6 @@ spec:
             - key: kubernetes.io/hostname
               operator: In
               values:
-                - "{{ $v }}"
+                - "{{ $v.name }}"
+{{ end }}
 {{ end }}

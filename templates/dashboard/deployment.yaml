@@ -6,7 +6,7 @@ metadata:
     {{- include "ng-v2t.labels" . | nindent 4 }}
     component: dashboard
 spec:
-  replicas: {{ .Values.dashboard.replicas }}
+  replicas: {{ .Values.dashboard.replicaCount }}
   selector:
     matchLabels:
       {{- include "ng-v2t.selectorLabels" . | nindent 6 }}

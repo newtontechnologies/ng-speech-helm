@@ -8,7 +8,7 @@ metadata:
   annotations:
     checksum/config: {{ include (print $.Template.BasePath "/core/secret.yaml") . | sha256sum }}
 spec:
-  replicas: {{ .Values.core.replicas }}
+  replicas: {{ .Values.core.replicaCount }}
   selector:
     matchLabels:
       {{- include "ng-v2t.selectorLabels" . | nindent 6 }}
@@ -102,3 +102,18 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+
+
+{{- if not .Values.license.token }}
+{{ fail "license token not set" }}
+{{- end }}
+
+
+{{- if not .Values.registry.username }}
+{{ fail "registry username not set" }}
+{{- end }}
+
+
+{{- if not .Values.registry.password }}
+{{ fail "registry password not set" }}
+{{- end }}

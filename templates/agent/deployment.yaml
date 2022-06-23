@@ -6,7 +6,7 @@ metadata:
     {{- include "ng-v2t.labels" . | nindent 4 }}
     component: agent
 spec:
-  replicas: {{ .Values.agent.replicas }}
+  replicas: {{ .Values.agent.replicaCount }}
   selector:
     matchLabels:
       {{- include "ng-v2t.selectorLabels" . | nindent 6 }}
