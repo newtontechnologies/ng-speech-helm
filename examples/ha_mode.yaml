@@ -24,4 +24,13 @@ persistence:
 etcd:
   replicaCount: 3
   persistence:
-    storageClass: managed-csi
+    storageClass: ceph-data
+  localPersistentVolumes:
+    enabled: true
+    nodes:
+      - name: node1
+        path: /var/lib/ng-etcd
+      - name: node2
+        path: /var/lib/ng-etcd
+      - name: node3
+        path: /var/lib/ng-etcd

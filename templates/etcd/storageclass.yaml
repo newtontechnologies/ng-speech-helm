@@ -2,7 +2,13 @@
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name:  "{{ $.Values.etcd.persistence.storageClass }}"
+  name:  "{{ .Values.etcd.persistence.storageClass }}"
 provisioner: kubernetes.io/no-provisioner
 volumeBindingMode: WaitForFirstConsumer
 {{ end }}
+
+
+
+{{- if not .Values.etcd.persistence.storageClass }}
+{{ fail "etcd persistence storage class must be set" }}
+{{- end }}
