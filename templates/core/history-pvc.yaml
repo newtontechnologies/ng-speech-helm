@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: "{{ include "ng-v2t.historyPvc" $ }}"
+spec:
+  accessModes:
+    {{- toYaml .Values.persistence.accessModes | nindent 4 }}
+  resources:
+    requests:
+      storage: {{ $.Values.persistence.historySize }}
+  storageClassName: "{{ default .Values.global.storageClass .Values.persistence.storageClass }}"

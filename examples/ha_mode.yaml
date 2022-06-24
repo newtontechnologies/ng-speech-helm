@@ -1,0 +1,36 @@
+
+
+
+services:
+  - atran-cz-openlex
+  - atran-us-openlex
+
+license:
+  token: "__MISSING__"
+
+registry:
+  username: "__MISSING__"
+  password: "__MISSING__"
+
+core:
+  replicaCount: 2
+
+dashboard:
+  replicaCount: 2
+
+persistence:
+  storageClass: ceph-filesystem
+
+etcd:
+  replicaCount: 3
+  persistence:
+    storageClass: ceph-data
+  localPersistentVolumes:
+    enabled: true
+    nodes:
+      - name: node1
+        path: /var/lib/ng-etcd
+      - name: node2
+        path: /var/lib/ng-etcd
+      - name: node3
+        path: /var/lib/ng-etcd

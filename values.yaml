@@ -1,0 +1,156 @@
+---
+nameOverride: ""
+fullnameOverride: ""
+
+
+imagePullPolicy: IfNotPresent
+
+
+global:
+  storageClass: ""
+  imagePullSecrets: [ ]
+
+license:
+  token: ""
+
+registry:
+  domain: harbor.newtoncloud.com
+  username: ""
+  password: ""
+  email: "nobody@email.com"
+
+persistence:
+  storageClass: ""
+  accessModes:
+    - ReadWriteMany
+  historySize: 20Gi
+  workspaceSize: 80Gi
+
+core:
+  replicaCount: 1
+  image:
+    repository: ng/core
+    tag: ""
+  structuredConfig:
+    login:
+      jwtKey: ""
+      jwtAudience: ""
+      adminUsername: ngadmin
+      adminPassword: ""
+    history:
+      dir: /var/lib/ng/history
+    workspace:
+      dir: /var/lib/ng/workspace
+    etcd:
+      username: root
+  config: |
+    etcd:
+      hostPort: "{{ template "ng-v2t.etcdHostPort" . }}"      
+      password: "{{ .Values.etcd.rbac.rootPassword }}"      
+    license:
+      {{- toYaml .Values.license | nindent 2 }}
+    pods:    
+      k8s:
+        namespace: {{ .Release.Namespace }}
+    registry:
+      {{- toYaml .Values.registry | nindent 2 }} 
+    services:      
+      static:
+    {{- include "ng-v2t.staticServices" .  | indent 4 }}
+  terminationGracePeriodSeconds: 600
+  extraArgs: [ ]
+  extraEnv: { }
+  nodeSelector: { }
+  podAnnotations: { }
+  resources: { }
+  tolerations: [ ]
+
+dashboard:
+  replicaCount: 1
+  pathPrefix: /dashboard
+  image:
+    repository: ng/dashboard
+    tag: 0.4.2
+  podAnnotations: { }
+  resources: { }
+  tolerations: [ ]
+  nodeSelector: { }
+
+agent:
+  replicaCount: 1
+  image:
+    repository: ng/v2t-agent
+    tag: ""
+  terminationGracePeriodSeconds: 600
+  extraArgs: [ ]
+  extraEnv: { }
+  resources: { }
+  tolerations: [ ]
+  affinity: { }
+  nodeSelector: { }
+  podAnnotations: { }
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: { }
+  host: ""
+  tls:
+    enabled: true
+    secretName: ""
+  traefikIngressRoute:
+    enabled: false
+    entrypoints:
+      - websecure
+
+serviceMonitor:
+  enabled: false
+
+catalog:
+  atran-cz-broadcast:
+    version: "22.0518.160000"
+  atran-pl-broadcast:
+    version: "22.0518.160000"
+  atran-sk-broadcast:
+    version: "22.0518.150000"
+  atran-cz-openlex:
+    version: "22.0607.200000"
+  atran-us-openlex:
+    version: "22.0607.200000"
+  atran-sk-openlex:
+    version: "22.0607.200000"
+  vad-default:
+    version: "22.0607.200000"
+  diar-default:
+    version: "22.0607.200000"
+  adsp-vprint-v3:
+    version: "22.0607.200000"
+
+etcd:
+  replicaCount: 1
+  enabled: true
+  localPersistentVolumes:
+    enabled: false
+    # number of nodes must be >= replicaCount
+    storageClass: ""
+    nodes:
+      - name: node1
+        path: /var/lib/my-etcd
+  extraEnvVars:
+    - name: ETCD_DISABLE_STORE_MEMBER_ID
+      value: "true"
+    - name: ETCD_DISABLE_PRESTOP
+      value: "true"
+  image:
+    registry: harbor.ite.tul.cz
+    repository: library/etcd
+    tag: 3.5.4-no-removal
+  rbac:
+    rootPassword: root
+  resources: { }
+  readinessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 20
+

@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ng-v2t.core" . }}
+  labels:
+    {{- include "ng-v2t.labels" . | nindent 4 }}
+    component: core
+  annotations:
+    checksum/config: {{ include (print $.Template.BasePath "/core/secret.yaml") . | sha256sum }}
+spec:
+  replicas: {{ .Values.core.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "ng-v2t.selectorLabels" . | nindent 6 }}
+      component: core
+  template:
+    metadata:
+      {{- with .Values.core.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "ng-v2t.selectorLabels" . | nindent 8 }}
+        component: core
+    spec:
+      imagePullSecrets:
+        - name: {{ include "ng-v2t.imagePullSecret" .}}
+      {{- with .Values.global.imagePullSecrets }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "ng-v2t.coreServiceAccountName" . }}
+      terminationGracePeriodSeconds: {{ .Values.core.terminationGracePeriodSeconds }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.registry.domain }}/{{ .Values.core.image.repository }}:{{ .Values.core.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          args:
+            - "core"
+            - "--cfg=/etc/ng/core.yaml"
+          {{- range .Values.core.extraArgs }}
+            - {{ . }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: 8080
+            - name: grpc
+              containerPort: 8081
+            - name: monitor
+              containerPort: 8082
+          {{- with .Values.core.extraEnv }}
+          env:
+              {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: cfg
+              mountPath: "/etc/ng"
+              readOnly: true
+            - name: workspace
+              mountPath: {{ .Values.core.structuredConfig.workspace.dir }}
+            - name: history
+              mountPath: {{ .Values.core.structuredConfig.history.dir }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: monitor
+            initialDelaySeconds: 2
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: monitor
+          resources:
+            {{- toYaml .Values.core.resources | nindent 12 }}
+      {{- with .Values.core.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: cfg
+          secret:
+            secretName: {{ include "ng-v2t.coreCfg" . }}
+        - name: workspace
+          persistentVolumeClaim:
+            claimName: {{ include "ng-v2t.workspacePvc" . }}
+        - name: history
+          persistentVolumeClaim:
+            claimName: {{ include "ng-v2t.historyPvc" . }}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: component
+                      operator: In
+                      values:
+                        - core
+                topologyKey: "kubernetes.io/hostname"
+                namespaces:
+                  - {{ .Release.Namespace }}
+              weight: 1
+      {{- with .Values.core.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+

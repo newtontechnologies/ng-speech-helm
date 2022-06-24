@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ng-v2t.dashboard" . }}
+  labels:
+    {{- include "ng-v2t.labels" . | nindent 4 }}
+    component: dashboard
+spec:
+  replicas: {{ .Values.dashboard.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "ng-v2t.selectorLabels" . | nindent 6 }}
+      component: dashboard
+  template:
+    metadata:
+      {{- with .Values.core.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "ng-v2t.selectorLabels" . | nindent 8 }}
+        component: dashboard
+    spec:
+      imagePullSecrets:
+        - name: {{ include "ng-v2t.imagePullSecret" .}}
+      {{- with .Values.global.imagePullSecrets }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.registry.domain }}/{{ .Values.dashboard.image.repository }}:{{ .Values.dashboard.image.tag  }}"
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          ports:
+            - name: http
+              containerPort: 80
+          env:
+            - name: PATH_PREFIX
+              value: "{{ .Values.dashboard.pathPrefix }}"
+            - name: CLUSTER_NAME
+              value: {{ include "ng-v2t.name" . }}
+          {{- with .Values.core.extraEnv }}
+              {{- toYaml . | nindent 12 }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.core.resources | nindent 12 }}
+      {{- with .Values.core.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: component
+                      operator: In
+                      values:
+                        - dashboard
+                topologyKey: "kubernetes.io/hostname"
+                namespaces:
+                  - {{ .Release.Namespace }}
+              weight: 1
+      {{- with .Values.core.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

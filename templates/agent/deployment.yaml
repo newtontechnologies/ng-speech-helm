@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ng-v2t.agent" . }}
+  labels:
+    {{- include "ng-v2t.labels" . | nindent 4 }}
+    component: agent
+spec:
+  replicas: {{ .Values.agent.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "ng-v2t.selectorLabels" . | nindent 6 }}
+      component: agent
+  template:
+    metadata:
+      {{- with .Values.core.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "ng-v2t.selectorLabels" . | nindent 8 }}
+        component: agent
+    spec:
+      imagePullSecrets:
+        - name: {{ include "ng-v2t.imagePullSecret" .}}
+      {{- with .Values.global.imagePullSecrets }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      terminationGracePeriodSeconds: {{ .Values.agent.terminationGracePeriodSeconds }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.registry.domain }}/{{ .Values.agent.image.repository }}:{{ .Values.agent.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          ports:
+            - name: monitor
+              containerPort: 8080
+            - name: grpc-api
+              containerPort: 8081
+          args:
+            - "agent"
+            - "--workspace-dir={{ .Values.core.structuredConfig.workspace.dir }}"
+          {{- with .Values.agent.extraArgs }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.agent.extraEnv }}
+          env:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: monitor
+            initialDelaySeconds: 2
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: monitor
+          resources:
+            {{- toYaml .Values.core.resources | nindent 12 }}
+          volumeMounts:
+            - name: workspace
+              mountPath: {{ .Values.core.structuredConfig.workspace.dir }}
+              readOnly: true
+      {{- with .Values.core.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.core.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: workspace
+          persistentVolumeClaim:
+            claimName: {{ include "ng-v2t.workspacePvc" . }}
