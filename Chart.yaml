@@ -6,7 +6,6 @@ version: 0.2.0
 appVersion: "0.5.5"
 icon: https://www.newtontech.net/wp-content/uploads/2022/06/nt-ico-rgb.png
 
-
 dependencies:
   - name: etcd
     version: ~8.3.0

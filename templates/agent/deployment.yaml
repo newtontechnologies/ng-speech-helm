@@ -23,7 +23,7 @@ spec:
     spec:
       imagePullSecrets:
         - name: {{ include "ng-v2t.imagePullSecret" .}}
-      {{- with .Values.imagePullSecrets }}
+      {{- with .Values.global.imagePullSecrets }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
       terminationGracePeriodSeconds: {{ .Values.agent.terminationGracePeriodSeconds }}

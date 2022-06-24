@@ -1,13 +1,12 @@
-{{ with .Values.persistence.workspace }}
+
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: "{{ include "ng-v2t.workspacePvc" $ }}"
 spec:
   accessModes:
-    {{- toYaml .accessModes | nindent 4 }}
+    {{- toYaml .Values.persistence.accessModes | nindent 4 }}
   resources:
     requests:
-      storage: {{ .storageSize }}
-  storageClassName: "{{ default $.Values.persistence.storageClassName .storageClassName }}"
-{{ end}}
+      storage: {{ $.Values.persistence.workspaceSize }}
+  storageClassName: "{{ default .Values.global.storageClass .Values.persistence.storageClass }}"

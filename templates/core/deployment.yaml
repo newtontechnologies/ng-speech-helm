@@ -25,7 +25,7 @@ spec:
     spec:
       imagePullSecrets:
         - name: {{ include "ng-v2t.imagePullSecret" .}}
-      {{- with .Values.imagePullSecrets }}
+      {{- with .Values.global.imagePullSecrets }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "ng-v2t.coreServiceAccountName" . }}
@@ -104,16 +104,3 @@ spec:
       {{- end }}
 
 
-{{- if not .Values.license.token }}
-{{ fail "license token not set" }}
-{{- end }}
-
-
-{{- if not .Values.registry.username }}
-{{ fail "registry username not set" }}
-{{- end }}
-
-
-{{- if not .Values.registry.password }}
-{{ fail "registry password not set" }}
-{{- end }}
