@@ -118,7 +118,6 @@ localhost:2379
 {{ join "," $result }}
 {{- end -}}
 
-
 {{- define "ng-speech.traefikOptionalHostRule" -}}
 {{- if .Values.traefikIngressRoute.host }}
 {{- printf "Host(`%s`) && " .Values.traefikIngressRoute.host  -}}

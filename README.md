@@ -1,6 +1,6 @@
 
 
-# Newton Speech Helm package
+# Newton V2T Helm package
 
 ## Global prerequisites
 - Kubernetes cluster 1.22+
