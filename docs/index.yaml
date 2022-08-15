@@ -3,7 +3,7 @@ entries:
   ng-speech:
   - apiVersion: v2
     appVersion: 0.9.0-beta5
-    created: "2022-08-15T12:39:49.203674+02:00"
+    created: "2022-08-15T12:40:45.0582151+02:00"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -13,30 +13,11 @@ entries:
       repository: https://helm.traefik.io/traefik
       version: 10.x.x
     description: Newton Technologies Speech Services
-    digest: b720782088bbd651dafe1787637207566c9dc418869f0f6044879cdeddd35ea7
+    digest: e2f35fcf1f0ae0d666264198be4d967c768747ed30d5e782f90bfda8d611382f
     icon: https://www.newtontech.net/wp-content/uploads/2022/06/nt-ico-rgb.png
     name: ng-speech
     type: application
     urls:
-    - https://newtontechnologies.github.io/ng-speech-helm/ng-speech-0.9.0-beta6.tgz
-    version: 0.9.0-beta6
-  - apiVersion: v2
-    appVersion: 0.9.0-beta4
-    created: "2022-08-15T12:39:49.2016743+02:00"
-    dependencies:
-    - name: common
-      repository: https://charts.bitnami.com/bitnami
-      version: 1.x.x
-    - condition: traefik.enabled
-      name: traefik
-      repository: https://helm.traefik.io/traefik
-      version: 10.x.x
-    description: Newton Technologies Speech Services
-    digest: 87452c37e4bd193cfe5edc634287fe352c2cdeda12c2f8af35dafafea9c97930
-    icon: https://www.newtontech.net/wp-content/uploads/2022/06/nt-ico-rgb.png
-    name: ng-speech
-    type: application
-    urls:
-    - https://newtontechnologies.github.io/ng-speech-helm/ng-speech-0.9.0-beta2.tgz
-    version: 0.9.0-beta2
-generated: "2022-08-15T12:39:49.1976761+02:00"
+    - https://newtontechnologies.github.io/ng-speech-helm/ng-speech-0.9.0-beta7.tgz
+    version: 0.9.0-beta7
+generated: "2022-08-15T12:40:45.0550987+02:00"
