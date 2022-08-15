@@ -44,18 +44,6 @@ app.kubernetes.io/name: {{ include "ng-v2t.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
-{{- define "ng-v2t.coreServiceAccountName" -}}
-{{- printf "%s-core" (include "ng-v2t.fullname" .) -}}
-{{- end }}
-
-{{- define "ng-v2t.coreRoleName" -}}
-{{- printf "%s-core-role" (include "ng-v2t.fullname" .) -}}
-{{- end }}
-
-{{- define "ng-v2t.coreRoleBindingName" -}}
-{{- printf "%s-core" (include "ng-v2t.fullname" .) -}}
-{{- end }}
-
 {{- define "ng-v2t.core" -}}
 {{- printf "%s-core" (include "ng-v2t.fullname" .) -}}
 {{- end -}}
@@ -64,7 +52,20 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- printf "%s-core" (include "ng-v2t.fullname" .) -}}
 {{- end -}}
 
+{{- define "ng-v2t.usersCfg" -}}
+{{- printf "%s-users" (include "ng-v2t.fullname" .) -}}
+{{- end -}}
+
+{{- define "ng-v2t.traefik" -}}
+{{- printf "%s-treafik" (include "ng-v2t.fullname" . ) -}}
+{{- end -}}
+
+
 {{- define "ng-v2t.agent" -}}
+{{- printf "%s-agent" (include "ng-v2t.fullname" .) -}}
+{{- end -}}
+
+{{- define "ng-v2t.agentCfg" -}}
 {{- printf "%s-agent" (include "ng-v2t.fullname" .) -}}
 {{- end -}}
 
@@ -85,25 +86,41 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{- define "ng-v2t.imagePullSecretBody" }}
-{{- with .Values.registry }}
+{{- with .Values.imagePullSecret }}
 {{- printf "{\"auths\":{\"%s\":{\"username\":\"%s\",\"password\":\"%s\",\"email\":\"%s\",\"auth\":\"%s\"}}}" .domain .username .password .email (printf "%s:%s" .username .password | b64enc) | b64enc }}
 {{- end }}
 {{- end }}
 
-{{- define "ng-v2t.staticServices" }}
-{{- range $idx, $k := .Values.services }}
-{{- if hasKey $.Values.catalog $k}}
-- service: {{ $k }}
-  version: {{ (get $.Values.catalog $k).version }}
-{{- end }}
+{{- define "ng-v2t.etcd" -}}
+{{- printf "%s-etcd" (include "ng-v2t.fullname" .) -}}
+{{- end -}}
+
+{{- define "ng-v2t.etcdHeadlessService" -}}
+{{- printf "%s-etcd-headless" (include "ng-v2t.fullname" .) -}}
+{{- end -}}
+
+{{- define "ng-v2t.etcdEndpoint" }}
+{{- if .Values.etcd.enabled }}
+{{- printf "%s:2379" (include "ng-v2t.etcd" .)  -}}
+{{- else if .Values.core.config.etcd.endpoint }}
+{{ .Values.core.config.etcd.endpoint }}
+{{- else }}
+localhost:2379
 {{- end }}
 {{- end }}
 
-{{- define "ng-v2t.etcdPvPrefix" }}
-{{- printf "%s-etcd-%s" .Release.Name . -}}
-{{- end }}
+{{- define "ng-v2t.etcdPeers" -}}
+{{- $result := list -}}
+{{- $to := int .Values.etcd.replicaCount }}
+{{- range $i := until $to -}}
+{{- $result = (printf "%s-%d=http://%s-%d.%s.%v.svc.%s:2380" (include "ng-v2t.etcd" $ ) $i (include "ng-v2t.etcd" $ ) $i (include "ng-v2t.etcdHeadlessService" $) $.Release.Namespace $.Values.clusterDomain)  | append $result -}}
+{{- end -}}
+{{ join "," $result }}
+{{- end -}}
 
-{{- define "ng-v2t.etcdHostPort" }}
-{{- printf "%s-etcd:2379" .Release.Name -}}
-{{- end }}
 
+{{- define "ng-v2t.traefikOptionalHostRule" -}}
+{{- if .Values.traefikIngressRoute.host }}
+{{- printf "Host(`%s`) && " .Values.traefikIngressRoute.host  -}}
+{{- end }}
+{{- end }}

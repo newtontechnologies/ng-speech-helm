@@ -2,155 +2,295 @@
 nameOverride: ""
 fullnameOverride: ""
 
-
 imagePullPolicy: IfNotPresent
-
+clusterDomain: cluster.local
 
 global:
   storageClass: ""
   imagePullSecrets: [ ]
 
-license:
-  token: ""
-
-registry:
-  domain: harbor.newtoncloud.com
+imagePullSecret:
+  enabled: false
+  domain: docker.io
   username: ""
   password: ""
   email: "nobody@email.com"
 
-persistence:
-  storageClass: ""
-  accessModes:
-    - ReadWriteMany
-  historySize: 20Gi
-  workspaceSize: 80Gi
-
 core:
+  enabled: true
   replicaCount: 1
   image:
-    repository: ng/core
+    repository: newtontechnologies/ng-core
     tag: ""
-  structuredConfig:
-    login:
-      jwtKey: ""
-      jwtAudience: ""
-      adminUsername: ngadmin
-      adminPassword: ""
-    history:
-      dir: /var/lib/ng/history
-    workspace:
-      dir: /var/lib/ng/workspace
+  updateStrategy:
+    type: RollingUpdate
+  config:
     etcd:
-      username: root
-  config: |
-    etcd:
-      hostPort: "{{ template "ng-v2t.etcdHostPort" . }}"      
-      password: "{{ .Values.etcd.rbac.rootPassword }}"      
+      endpoint: ""
+      username: ""
+      password: ""
+      namespace: "ng-v1"
     license:
-      {{- toYaml .Values.license | nindent 2 }}
-    pods:    
-      k8s:
-        namespace: {{ .Release.Namespace }}
+      token: ""
+    login:
+      jwt:
+        key: "insecure-key"
+        audience: ""
+        ttl: "4h"
+      admin:
+        username: ngadmin
+        password: ngadmin
+    history:
+      type: fs
+      fs:
+        dir: /var/lib/ng/history
+        persistence:
+          enabled: true
+          storageClass: ""
+          accessModes:
+            - ReadWriteMany
+          size: 80Gi
+      s3:
+        endpoint: ""
+        region: us-east-1
+        key: ""
+        secret: ""
+        bucket: ""
     registry:
-      {{- toYaml .Values.registry | nindent 2 }} 
-    services:      
-      static:
-    {{- include "ng-v2t.staticServices" .  | indent 4 }}
-  terminationGracePeriodSeconds: 600
-  extraArgs: [ ]
-  extraEnv: { }
-  nodeSelector: { }
+      token: "insecure-token"
+    users: []
+#     - name: user1
+#       password: $2a$12$JzH4Z.hZ1Q.5bMvO5wycq.dYpSzZYn36hVgAm2V3jemW/aT5njVXe # brycpt hash or plaintext
+#       permissions: [admin, monitor, ]
+#         - admin
+#       requestLimit: 128         # set to 0 for unlimited
+
+    usersDir: /var/lib/ng/users
+    sharedWorkspace:
+      enabled: false
+      dir: /var/lib/ng/shared-workspace
+      persistence:
+        storageClass: ""
+        accessModes:
+          - ReadWriteMany
+        size: 80Gi
+  args: [ ]
+  extraEnvVars: [ ]
+  extraEnvVarsSecret: ""
+  extraEnvVarsCM: ""
+  podLabels: { }
   podAnnotations: { }
-  resources: { }
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: 1
+      memory: 1Gi
+  affinity: { }
+  ## Allowed values: `soft` or `hard`
+  podAffinityPreset: ""
+  ## Allowed values: `soft` or `hard`
+  podAntiAffinityPreset: soft
+  nodeAffinityPreset:
+    ## Allowed values: `soft` or `hard`
+    type: ""
+    key: ""
+    values: [ ]
+  nodeSelector: { }
+  priorityClassName: ""
+  schedulerName: ""
+  automountServiceAccountToken: false
   tolerations: [ ]
+  terminationGracePeriodSeconds: 600
+  pdb:
+    enabled: true
+    minAvailable: 1
+    maxUnavailable: ""
 
 dashboard:
+  enabled: true
   replicaCount: 1
   pathPrefix: /dashboard
   image:
-    repository: ng/dashboard
-    tag: 0.4.2
+    repository: newtontechnologies/ng-dashboard
+    tag: 0.9.0-beta0
+  updateStrategy:
+    type: RollingUpdate
   podAnnotations: { }
-  resources: { }
-  tolerations: [ ]
+  args: [ ]
+  extraEnvVars: [ ]
+  extraEnvVarsSecret: ""
+  extraEnvVarsCM: ""
+  terminationGracePeriodSeconds: 600
+  podLabels: { }
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+  affinity: { }
+  ## Allowed values: `soft` or `hard`
+  podAffinityPreset: ""
+  ## Allowed values: `soft` or `hard`
+  podAntiAffinityPreset: soft
+  nodeAffinityPreset:
+    ## Allowed values: `soft` or `hard`
+    type: ""
+    key: ""
+    values: [ ]
   nodeSelector: { }
+  priorityClassName: ""
+  schedulerName: ""
+  automountServiceAccountToken: false
+  tolerations: [ ]
 
 agent:
+  enabled: true
   replicaCount: 1
   image:
-    repository: ng/v2t-agent
+    repository: newtontechnologies/ng-v2t-agent
     tag: ""
+  updateStrategy:
+    type: RollingUpdate
+  config:
+    sharedWorkspace:
+      enabled: false
+      dir: /var/lib/ng/shared-workspace
+  args: [ ]
+  extraEnvVars: [ ]
+  extraEnvVarsSecret: ""
+  extraEnvVarsCM: ""
   terminationGracePeriodSeconds: 600
-  extraArgs: [ ]
-  extraEnv: { }
-  resources: { }
-  tolerations: [ ]
-  affinity: { }
-  nodeSelector: { }
+  podLabels: { }
   podAnnotations: { }
-
-ingress:
-  enabled: false
-  className: ""
-  annotations: { }
-  host: ""
-  tls:
+  resources:
+    requests:
+      cpu: 1
+      memory: 3Gi
+    limits:
+      cpu: 1200m
+      memory: 4500Mi
+  affinity: { }
+  ## Allowed values: `soft` or `hard`
+  podAffinityPreset: ""
+  ## Allowed values: `soft` or `hard`
+  podAntiAffinityPreset: soft
+  nodeAffinityPreset:
+    ## Allowed values: `soft` or `hard`
+    type: ""
+    key: ""
+    values: [ ]
+  nodeSelector: { }
+  priorityClassName: ""
+  schedulerName: ""
+  automountServiceAccountToken: false
+  tolerations: [ ]
+  pdb:
     enabled: true
-    secretName: ""
-  traefikIngressRoute:
-    enabled: false
-    entrypoints:
-      - websecure
+    minAvailable: ""
+    maxUnavailable: "25%"
 
 serviceMonitor:
   enabled: false
 
-catalog:
-  atran-cz-broadcast:
-    version: "22.0518.160000"
-  atran-pl-broadcast:
-    version: "22.0518.160000"
-  atran-sk-broadcast:
-    version: "22.0518.150000"
-  atran-cz-openlex:
-    version: "22.0607.200000"
-  atran-us-openlex:
-    version: "22.0607.200000"
-  atran-sk-openlex:
-    version: "22.0607.200000"
-  vad-default:
-    version: "22.0607.200000"
-  diar-default:
-    version: "22.0607.200000"
-  adsp-vprint-v3:
-    version: "22.0607.200000"
-
 etcd:
-  replicaCount: 1
   enabled: true
-  localPersistentVolumes:
-    enabled: false
-    # number of nodes must be >= replicaCount
-    storageClass: ""
-    nodes:
-      - name: node1
-        path: /var/lib/my-etcd
-  extraEnvVars:
-    - name: ETCD_DISABLE_STORE_MEMBER_ID
-      value: "true"
-    - name: ETCD_DISABLE_PRESTOP
-      value: "true"
+  replicaCount: 1
+  autoCompactionMode: periodic
+  autoCompactionRetention: 10m
   image:
-    registry: harbor.ite.tul.cz
-    repository: library/etcd
-    tag: 3.5.4-no-removal
-  rbac:
-    rootPassword: root
-  resources: { }
-  readinessProbe:
-    initialDelaySeconds: 5
-    periodSeconds: 5
-    timeoutSeconds: 3
-    failureThreshold: 20
+    registry: quay.io
+    repository: coreos/etcd
+    tag: v3.5.4
+  updateStrategy:
+    type: RollingUpdate
+  podAnnotations: { }
+  args: [ ]
+  extraEnvVars: [ ]
+  extraEnvVarsSecret: ""
+  extraEnvVarsCM: ""
+  terminationGracePeriodSeconds: 600
+  podLabels: { }
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 1
+      memory: 2Gi
+  affinity: { }
+  ## Allowed values: `soft` or `hard`
+  podAffinityPreset: ""
+  ## Allowed values: `soft` or `hard`
+  podAntiAffinityPreset: soft
+  nodeAffinityPreset:
+    ## Allowed values: `soft` or `hard`
+    type: ""
+    key: ""
+    values: [ ]
+  nodeSelector: { }
+  priorityClassName: ""
+  schedulerName: ""
+  automountServiceAccountToken: false
+  tolerations: [ ]
+  podManagementPolicy: Parallel
+  persistence:
+    enabled: true
+    storageClass: ""
+    accessModes:
+      - ReadWriteMany
+    size: 10Gi
+  livenessProbe:
+    httpGet:
+      path: /metrics
+      port: client
+    initialDelaySeconds: 15
+    periodSeconds: 10
+    successThreshold: 1
+    failureThreshold: 5
+    timeoutSeconds: 5
+  pdb:
+    enabled: true
+    minAvailable: "51%"
+    maxUnavailable: ""
 
+traefikIngressRoute:
+  enabled: true
+  host: ""
+  tls:
+    secretName: ""
+  entrypoints:
+    - websecure
+    - web
+
+traefik:
+  enabled: true
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 250m
+      memory: 512Mi
+  deployment:
+    replicas: 1
+  rbac:
+    namespaced: true
+  providers:
+    kubernetesCRD:
+      enabled: true
+    kubernetesIngress:
+      enabled: false
+  ingressRoute:
+    dashboard:
+      enabled: true
+  ports:
+    web:
+      expose: true
+    websecure:
+      expose: true
+  service:
+    type: ClusterIP

@@ -1,0 +1,17 @@
+{{- if (and .Values.core.enabled .Values.core.pdb.enabled) }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "ng-v2t.core" . }}
+spec:
+  {{- if .Values.core.pdb.minAvailable }}
+  minAvailable: {{ .Values.core.pdb.minAvailable }}
+  {{- end }}
+  {{- if .Values.core.pdb.maxUnavailable }}
+  maxUnavailable: {{ .Values.core.pdb.maxUnavailable }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "ng-v2t.selectorLabels" . | nindent 6 }}
+      component: core
+{{- end }}

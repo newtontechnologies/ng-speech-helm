@@ -1,12 +1,15 @@
-
+{{- if (and .Values.core.enabled .Values.core.config.sharedWorkspace.enabled) }}
+{{- with .Values.core.config.sharedWorkspace.persistence }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: "{{ include "ng-v2t.workspacePvc" $ }}"
 spec:
   accessModes:
-    {{- toYaml .Values.persistence.accessModes | nindent 4 }}
+    {{- toYaml .accessModes | nindent 4 }}
   resources:
     requests:
-      storage: {{ $.Values.persistence.workspaceSize }}
-  storageClassName: "{{ default .Values.global.storageClass .Values.persistence.storageClass }}"
+      storage: {{ .size }}
+  storageClassName: "{{ default $.Values.global.storageClass .storageClass }}"
+{{- end }}
+{{- end }}

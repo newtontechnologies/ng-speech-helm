@@ -1,3 +1,4 @@
+{{- if .Values.dashboard.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -11,57 +12,82 @@ spec:
     matchLabels:
       {{- include "ng-v2t.selectorLabels" . | nindent 6 }}
       component: dashboard
+  {{- if .Values.dashboard.updateStrategy }}
+  strategy: {{- toYaml .Values.dashboard.updateStrategy | nindent 4 }}
+  {{- end }}
   template:
     metadata:
-      {{- with .Values.core.podAnnotations }}
       annotations:
-        {{- toYaml . | nindent 8 }}
+      {{- if .Values.dashboard.podAnnotations }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.dashboard.podAnnotations "context" $) | nindent 8 }}
       {{- end }}
       labels:
         {{- include "ng-v2t.selectorLabels" . | nindent 8 }}
         component: dashboard
+        {{- if .Values.dashboard.podLabels }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.dashboard.podLabels "context" $) | nindent 8 }}
+        {{- end }}
     spec:
+      {{- if (or .Values.imagePullSecret.enabled .Values.global.imagePullSecrets) }}
       imagePullSecrets:
+      {{- if .Values.imagePullSecret.enabled }}
         - name: {{ include "ng-v2t.imagePullSecret" .}}
-      {{- with .Values.global.imagePullSecrets }}
-        {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- if .Values.global.imagePullSecrets }}
+      {{- toYaml .Values.global.imagePullSecrets | nindent 8 }}
+      {{- end }}
+      {{- end }}
+      automountServiceAccountToken: {{ .Values.dashboard.automountServiceAccountToken }}
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.registry.domain }}/{{ .Values.dashboard.image.repository }}:{{ .Values.dashboard.image.tag  }}"
+          image: "{{ .Values.dashboard.image.repository }}:{{ .Values.dashboard.image.tag  }}"
           imagePullPolicy: {{ .Values.imagePullPolicy }}
           ports:
             - name: http
               containerPort: 80
+          envFrom:
+            {{- if .Values.dashboard.extraEnvVarsCM }}
+            - configMapRef:
+                name: {{ .Values.dashboard.extraEnvVarsCM }}
+            {{- end }}
+            {{- if .Values.dashboard.extraEnvVarsSecret }}
+            - secretRef:
+                name: {{ .Values.dashboard.extraEnvVarsSecret }}
+            {{- end }}
+          {{- if .Values.dashboard.args }}
+          args:
+            {{- range .Values.dashboard.args }}
+            - "{{ . }}"
+            {{- end }}
+          {{- end }}
           env:
             - name: PATH_PREFIX
               value: "{{ .Values.dashboard.pathPrefix }}"
             - name: CLUSTER_NAME
               value: {{ include "ng-v2t.name" . }}
-          {{- with .Values.core.extraEnv }}
+          {{- with .Values.dashboard.extraEnvVars }}
               {{- toYaml . | nindent 12 }}
           {{- end }}
           resources:
-            {{- toYaml .Values.core.resources | nindent 12 }}
-      {{- with .Values.core.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+            {{- toYaml .Values.dashboard.resources | nindent 12 }}
+      {{- if .Values.dashboard.affinity }}
+      affinity: {{- include "common.tplvalues.render" (dict "value" .Values.dashboard.affinity "context" $) | nindent 8 }}
+      {{- else }}
       affinity:
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - podAffinityTerm:
-                labelSelector:
-                  matchExpressions:
-                    - key: component
-                      operator: In
-                      values:
-                        - dashboard
-                topologyKey: "kubernetes.io/hostname"
-                namespaces:
-                  - {{ .Release.Namespace }}
-              weight: 1
-      {{- with .Values.core.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
+        podAffinity: {{- include "common.affinities.pods" (dict "type" .Values.dashboard.podAffinityPreset "component" "dashboard" "context" $) | nindent 10 }}
+        podAntiAffinity: {{- include "common.affinities.pods" (dict "type" .Values.dashboard.podAntiAffinityPreset "component" "dashboard" "context" $) | nindent 10 }}
+        nodeAffinity: {{- include "common.affinities.nodes" (dict "type" .Values.dashboard.nodeAffinityPreset.type "key" .Values.dashboard.nodeAffinityPreset.key "values" .Values.dashboard.nodeAffinityPreset.values) | nindent 10 }}
       {{- end }}
+      {{- if .Values.dashboard.nodeSelector }}
+      nodeSelector: {{- include "common.tplvalues.render" (dict "value" .Values.dashboard.nodeSelector "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.dashboard.tolerations }}
+      tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.dashboard.tolerations "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.dashboard.priorityClassName }}
+      priorityClassName: {{ .Values.dashboard.priorityClassName | quote }}
+      {{- end }}
+      {{- if .Values.dashboard.schedulerName }}
+      schedulerName: {{ .Values.dashboard.schedulerName }}
+      {{- end }}
+{{- end }}

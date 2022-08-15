@@ -1,0 +1,42 @@
+apiVersion: v1
+entries:
+  ng-v2t:
+  - apiVersion: v2
+    appVersion: 0.9.0-beta4
+    created: "2022-08-15T10:46:29.1012395+02:00"
+    dependencies:
+    - name: common
+      repository: https://charts.bitnami.com/bitnami
+      version: 1.x.x
+    - condition: traefik.enabled
+      name: traefik
+      repository: https://helm.traefik.io/traefik
+      version: 10.x.x
+    description: A Helm chart for install Newton Technologies v2t platform
+    digest: 5b1c27443e1076d5f4276f7d7fa48128f4bdcb70953d45732a8d577a9cb9f252
+    icon: https://www.newtontech.net/wp-content/uploads/2022/06/nt-ico-rgb.png
+    name: ng-v2t
+    type: application
+    urls:
+    - https://technosophos.github.com/tscharts/ng-v2t-0.9.0-beta2.tgz
+    version: 0.9.0-beta2
+  - apiVersion: v2
+    appVersion: 0.9.0-beta4
+    created: "2022-08-15T10:46:29.0986855+02:00"
+    dependencies:
+    - name: common
+      repository: https://charts.bitnami.com/bitnami
+      version: 1.x.x
+    - condition: traefik.enabled
+      name: traefik
+      repository: https://helm.traefik.io/traefik
+      version: 10.x.x
+    description: A Helm chart for install Newton Technologies v2t platform
+    digest: 71bc180db9979fd3240d18aeae2a9f70235f17e2e5cbfeb706484aa136cae5bf
+    icon: https://www.newtontech.net/wp-content/uploads/2022/06/nt-ico-rgb.png
+    name: ng-v2t
+    type: application
+    urls:
+    - https://technosophos.github.com/tscharts/ng-v2t-0.9.0-beta1.tgz
+    version: 0.9.0-beta1
+generated: "2022-08-15T10:46:29.0956026+02:00"

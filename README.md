@@ -15,14 +15,13 @@ All input/output data is processed only as in-memory stream.
 
 ### Core
 
-* API server, scheduler and agent load balancer 
+* API server, scheduler and gateway
 * Uses Etcd for runtime data
-* Stores historical data on disk
-* Stores agent bootstrap data on disk 
+* Stores historical data on filesystem or s3
 
 ### Dashboard
 
-* Web interface for *Core* component. 
+* Web interface for *Core* component
 
 ### Agent
 
@@ -39,10 +38,6 @@ All input/output data is processed only as in-memory stream.
 ### History persistent volume
 
 * Historical diagnostic and monitoring data
-
-### Workspace persistent volume
-
-* Agent bootstrap and runtime data
 
 
 ## Deployment modes
@@ -70,51 +65,14 @@ core:
   replicaCount: 2
 dashboard:
   replicaCount: 2
-
-
-
-
+agent:
+  replicaCount: 1
+etcd:  
+  replicaCount: 3
+traefik:
+  deployment:
+    replicas: 2
 ```
 
 
-## Agent resources
 
-
-
-## Etcd performance
-
-
-### Disaster recovery
-
-* Losing history PV
-    * historical data is lost, runtime data is not affected
-    * replace volume
-    * restart *Core* deployment
-* Losing workspace PV
-    * agents will fail to process new requests
-    * replace volume
-    * restart *Core* and *Agent* deployment
-    * missing data will be re-downloaded upon *Core* (leader) restart
-    * watch *Core* (leader) logs till service import finished
-* Losing *Etcd* cluster (without backup)
-    * Perform clean install  (optionally keeping history volume)
-    * you will lose user objects data (login, permissions)
-        * may not matter when using only default account
-    * other data will be recreated after restart
-
-
-
-
-
-
-
-### Publish
-
-1. Package
-```shell
-helm package .
-```
-2. Publish
-```shell
-helm push ng-v2t-$(VERSION).tgz oci://$(REGISTRY)/helm-charts/ng-v2t
-```

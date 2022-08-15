@@ -1,0 +1,132 @@
+{{- if .Values.etcd.enabled }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "ng-v2t.etcd" . }}
+  labels:
+    {{- include "ng-v2t.labels" . | nindent 4 }}
+    component: etcd
+spec:
+  replicas: {{ .Values.etcd.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "ng-v2t.selectorLabels" . | nindent 6 }}
+      component: etcd
+  serviceName: "{{- include "ng-v2t.etcdHeadlessService" . }}"
+  template:
+    metadata:
+      annotations:
+      {{- if .Values.etcd.podAnnotations }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.etcd.podAnnotations "context" $) | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "ng-v2t.selectorLabels" . | nindent 8 }}
+        component: etcd
+        {{- if .Values.etcd.podLabels }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.etcd.podLabels "context" $) | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- if .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml .Values.global.imagePullSecrets | nindent 8 }}
+      {{- end }}
+      automountServiceAccountToken: {{ .Values.etcd.automountServiceAccountToken }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.etcd.image.registry }}/{{ .Values.etcd.image.repository }}:{{ .Values.etcd.image.tag  }}"
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          ports:
+            - containerPort: 2379
+              name: client
+            - containerPort: 2380
+              name: peer
+          envFrom:
+            {{- if .Values.etcd.extraEnvVarsCM }}
+            - configMapRef:
+                name: {{ .Values.etcd.extraEnvVarsCM }}
+            {{- end }}
+            {{- if .Values.etcd.extraEnvVarsSecret }}
+            - secretRef:
+                name: {{ .Values.etcd.extraEnvVarsSecret }}
+            {{- end }}
+          livenessProbe:  {{ .Values.etcd.livenessProbe | toYaml | nindent 12 }}
+          args:
+            - /bin/sh
+            - -c
+            - |
+              exec etcd --name ${MY_POD_NAME} \
+                --listen-peer-urls http://0.0.0.0:2380 \
+                --listen-client-urls http://0.0.0.0:2379 \
+                --advertise-client-urls http://${MY_POD_NAME}.{{ include "ng-v2t.etcdHeadlessService" . }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:2379 \
+                --initial-advertise-peer-urls http://${MY_POD_NAME}.{{ include "ng-v2t.etcdHeadlessService" . }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:2380 \
+                --initial-cluster-token {{ include "ng-v2t.core" . }} \
+                --initial-cluster {{ include "ng-v2t.etcdPeers" . }} \
+                --auto-compaction-mode {{ .Values.etcd.autoCompactionMode }} \
+                --auto-compaction-retention {{ .Values.etcd.autoCompactionRetention }} \
+                --initial-cluster-state new \
+                --data-dir /var/run/etcd/default.etcd
+              {{- if .Values.etcd.args }}
+            {{- range .Values.etcd.args }}
+            - "{{ . }}"
+            {{- end }}
+          {{- end }}
+          env:
+            - name: MY_POD_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
+          {{- with .Values.etcd.extraEnvVars }}
+              {{- toYaml . | nindent 12 }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.etcd.resources | nindent 12 }}
+          volumeMounts:
+            - mountPath: /var/run/etcd
+              name: data
+
+      {{- if .Values.etcd.affinity }}
+      affinity: {{- include "common.tplvalues.render" (dict "value" .Values.etcd.affinity "context" $) | nindent 8 }}
+      {{- else }}
+      affinity:
+        podAffinity: {{- include "common.affinities.pods" (dict "type" .Values.etcd.podAffinityPreset "component" "etcd" "context" $) | nindent 10 }}
+        podAntiAffinity: {{- include "common.affinities.pods" (dict "type" .Values.etcd.podAntiAffinityPreset "component" "etcd" "context" $) | nindent 10 }}
+        nodeAffinity: {{- include "common.affinities.nodes" (dict "type" .Values.etcd.nodeAffinityPreset.type "key" .Values.etcd.nodeAffinityPreset.key "values" .Values.etcd.nodeAffinityPreset.values) | nindent 10 }}
+      {{- end }}
+      {{- if .Values.etcd.nodeSelector }}
+      nodeSelector: {{- include "common.tplvalues.render" (dict "value" .Values.etcd.nodeSelector "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.etcd.tolerations }}
+      tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.etcd.tolerations "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.etcd.priorityClassName }}
+      priorityClassName: {{ .Values.etcd.priorityClassName | quote }}
+      {{- end }}
+      {{- if .Values.etcd.schedulerName }}
+      schedulerName: {{ .Values.etcd.schedulerName }}
+      {{- end }}
+{{- if not .Values.etcd.persistence.enabled }}
+      volumes:
+        - name: data
+          emptyDir: {}
+{{- else }}
+  volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: data
+      spec:
+        accessModes:
+          {{- toYaml .Values.etcd.persistence.accessModes | nindent 10 }}
+        resources:
+          requests:
+            storage: "{{ .Values.etcd.persistence.size }}"
+        storageClassName: "{{ default $.Values.global.storageClass .Values.etcd.persistence.storageClass }}"
+        volumeMode: Filesystem
+{{- end }}
+  updateStrategy: {{ .Values.etcd.updateStrategy | toYaml | nindent 4 }}
+  podManagementPolicy: "{{ .Values.etcd.podManagementPolicy }}"
+
+
+{{- end }}
+

@@ -1,4 +1,4 @@
-
+{{- if .Values.core.enabled }}
 kind: Service
 apiVersion: v1
 metadata:
@@ -23,4 +23,4 @@ spec:
   selector:
     {{- include "ng-v2t.selectorLabels" . | nindent 4 }}
     component: core
-
+{{- end }}

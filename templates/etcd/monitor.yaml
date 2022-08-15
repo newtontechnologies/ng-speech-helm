@@ -1,0 +1,19 @@
+{{- if (and .Values.etcd.enabled .Values.serviceMonitor.enabled) }}
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: {{ include "ng-v2t.etcd" . }}
+spec:
+  podMetricsEndpoints:
+    - port: client
+      path: /metrics
+  namespaceSelector:
+    matchNames:
+      - "{{ .Release.Namespace }}"
+  selector:
+    matchLabels:
+      {{- include "ng-v2t.labels" . | nindent 4 }}
+      component: etcd
+  podTargetLabels:
+    - component
+{{- end}}
