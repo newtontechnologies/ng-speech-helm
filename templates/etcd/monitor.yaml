@@ -12,7 +12,7 @@ spec:
       - "{{ .Release.Namespace }}"
   selector:
     matchLabels:
-      {{- include "ng-speech.labels" . | nindent 4 }}
+      {{- include "ng-speech.labels" . | nindent 6 }}
       component: etcd
   podTargetLabels:
     - component
