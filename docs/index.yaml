@@ -3,7 +3,7 @@ entries:
   ng-speech:
   - apiVersion: v2
     appVersion: 0.9.0-beta5
-    created: "2022-08-15T12:38:18.4541258+02:00"
+    created: "2022-08-15T12:39:49.203674+02:00"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -13,7 +13,7 @@ entries:
       repository: https://helm.traefik.io/traefik
       version: 10.x.x
     description: Newton Technologies Speech Services
-    digest: 985fe5eb507f479bbe739f96cd7e7378fd707760233e5c7b91b45c1f52bb1881
+    digest: b720782088bbd651dafe1787637207566c9dc418869f0f6044879cdeddd35ea7
     icon: https://www.newtontech.net/wp-content/uploads/2022/06/nt-ico-rgb.png
     name: ng-speech
     type: application
@@ -21,27 +21,8 @@ entries:
     - https://newtontechnologies.github.io/ng-speech-helm/ng-speech-0.9.0-beta6.tgz
     version: 0.9.0-beta6
   - apiVersion: v2
-    appVersion: 0.9.0-beta5
-    created: "2022-08-15T12:38:18.4420777+02:00"
-    dependencies:
-    - name: common
-      repository: https://charts.bitnami.com/bitnami
-      version: 1.x.x
-    - condition: traefik.enabled
-      name: traefik
-      repository: https://helm.traefik.io/traefik
-      version: 10.x.x
-    description: Newton Technologies Speech Services
-    digest: 735412d640e981c546b768f14dc0c9ee773f112bd94ace5859065f9f256b1b10
-    icon: https://www.newtontech.net/wp-content/uploads/2022/06/nt-ico-rgb.png
-    name: ng-speech
-    type: application
-    urls:
-    - https://newtontechnologies.github.io/ng-speech-helm/ng-speech-0.9.0-beta5.tgz
-    version: 0.9.0-beta5
-  - apiVersion: v2
     appVersion: 0.9.0-beta4
-    created: "2022-08-15T12:38:18.4320423+02:00"
+    created: "2022-08-15T12:39:49.2016743+02:00"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -58,4 +39,4 @@ entries:
     urls:
     - https://newtontechnologies.github.io/ng-speech-helm/ng-speech-0.9.0-beta2.tgz
     version: 0.9.0-beta2
-generated: "2022-08-15T12:38:18.4305299+02:00"
+generated: "2022-08-15T12:39:49.1976761+02:00"

@@ -22,4 +22,5 @@
 *.tmproj
 .vscode/
 ng-speech.*.tgz
+docs
 
