@@ -3,7 +3,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: "{{ include "ng-v2t.workspacePvc" $ }}"
+  name: "{{ include "ng-speech.workspacePvc" $ }}"
 spec:
   accessModes:
     {{- toYaml .accessModes | nindent 4 }}

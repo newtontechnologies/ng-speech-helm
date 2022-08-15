@@ -2,15 +2,15 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "ng-v2t.dashboard" . }}
+  name: {{ include "ng-speech.dashboard" . }}
   labels:
-    {{- include "ng-v2t.labels" . | nindent 4 }}
+    {{- include "ng-speech.labels" . | nindent 4 }}
     component: dashboard
 spec:
   replicas: {{ .Values.dashboard.replicaCount }}
   selector:
     matchLabels:
-      {{- include "ng-v2t.selectorLabels" . | nindent 6 }}
+      {{- include "ng-speech.selectorLabels" . | nindent 6 }}
       component: dashboard
   {{- if .Values.dashboard.updateStrategy }}
   strategy: {{- toYaml .Values.dashboard.updateStrategy | nindent 4 }}
@@ -22,7 +22,7 @@ spec:
         {{- include "common.tplvalues.render" (dict "value" .Values.dashboard.podAnnotations "context" $) | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "ng-v2t.selectorLabels" . | nindent 8 }}
+        {{- include "ng-speech.selectorLabels" . | nindent 8 }}
         component: dashboard
         {{- if .Values.dashboard.podLabels }}
         {{- include "common.tplvalues.render" (dict "value" .Values.dashboard.podLabels "context" $) | nindent 8 }}
@@ -31,7 +31,7 @@ spec:
       {{- if (or .Values.imagePullSecret.enabled .Values.global.imagePullSecrets) }}
       imagePullSecrets:
       {{- if .Values.imagePullSecret.enabled }}
-        - name: {{ include "ng-v2t.imagePullSecret" .}}
+        - name: {{ include "ng-speech.imagePullSecret" .}}
       {{- end }}
       {{- if .Values.global.imagePullSecrets }}
       {{- toYaml .Values.global.imagePullSecrets | nindent 8 }}
@@ -64,7 +64,7 @@ spec:
             - name: PATH_PREFIX
               value: "{{ .Values.dashboard.pathPrefix }}"
             - name: CLUSTER_NAME
-              value: {{ include "ng-v2t.name" . }}
+              value: {{ include "ng-speech.name" . }}
           {{- with .Values.dashboard.extraEnvVars }}
               {{- toYaml . | nindent 12 }}
           {{- end }}

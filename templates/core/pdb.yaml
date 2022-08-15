@@ -2,7 +2,7 @@
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: {{ include "ng-v2t.core" . }}
+  name: {{ include "ng-speech.core" . }}
 spec:
   {{- if .Values.core.pdb.minAvailable }}
   minAvailable: {{ .Values.core.pdb.minAvailable }}
@@ -12,6 +12,6 @@ spec:
   {{- end }}
   selector:
     matchLabels:
-      {{- include "ng-v2t.selectorLabels" . | nindent 6 }}
+      {{- include "ng-speech.selectorLabels" . | nindent 6 }}
       component: core
 {{- end }}

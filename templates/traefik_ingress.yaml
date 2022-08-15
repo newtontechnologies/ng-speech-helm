@@ -15,35 +15,35 @@ spec:
     - kind: Rule
       match: {{ print "Host(`{{ $.Values.ingress.host }}`)" "&&" "PathPrefix(`/`)" }}
       services:
-        - name: {{ include "ng-v2t.core" . }}
+        - name: {{ include "ng-speech.core" . }}
           port: http
     - kind: Rule
       match: {{ print "Host(`{{ $.Values.ingress.host }}`)" "&&" "Headers(`Content-Type`,`application/grpc`)" }}
       services:
-        - name: {{ include "ng-v2t.core" . }}
+        - name: {{ include "ng-speech.core" . }}
           port: grpc
           scheme: h2c
     - kind: Rule
       match: {{ print "Host(`{{ $.Values.ingress.host }}`)" "&&" "PathPrefix(`{{ $.Values.dashboard.pathPrefix }}`)" }}
       services:
-        - name: {{ include "ng-v2t.dashboard" . }}
+        - name: {{ include "ng-speech.dashboard" . }}
           port: http
 {{ else}}
     - kind: Rule
       match: PathPrefix(`/`)
       services:
-        - name: {{ include "ng-v2t.core" . }}
+        - name: {{ include "ng-speech.core" . }}
           port: http
     - kind: Rule
       match: Headers(`Content-Type`,`application/grpc`)
       services:
-        - name: {{ include "ng-v2t.core" . }}
+        - name: {{ include "ng-speech.core" . }}
           port: grpc
           scheme: h2c
     - kind: Rule
       match: PathPrefix(`{{ $.Values.dashboard.pathPrefix }}`)
       services:
-        - name: {{ include "ng-v2t.dashboard" . }}
+        - name: {{ include "ng-speech.dashboard" . }}
           port: http
 {{- end}}
 {{- if .Values.ingress.tls.enabled}}

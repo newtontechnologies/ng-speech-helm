@@ -1,11 +1,11 @@
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: {{ include "ng-v2t.coreRoleBindingName" . }}
+  name: {{ include "ng-speech.coreRoleBindingName" . }}
 subjects:
   - kind: ServiceAccount
-    name: {{ include "ng-v2t.coreServiceAccountName" . }}
+    name: {{ include "ng-speech.coreServiceAccountName" . }}
 roleRef:
   kind: Role
-  name: {{ include "ng-v2t.coreRoleName" . }}
+  name: {{ include "ng-speech.coreRoleName" . }}
   apiGroup: rbac.authorization.k8s.io

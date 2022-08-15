@@ -2,26 +2,26 @@
 kind: IngressRoute
 apiVersion: traefik.containo.us/v1alpha1
 metadata:
-  name:  "{{ include "ng-v2t.name" . }}"
+  name:  "{{ include "ng-speech.name" . }}"
 spec:
   entryPoints:
     {{- toYaml .Values.traefikIngressRoute.entrypoints | nindent 4 }}
   routes:
     - kind: Rule
-      match: {{ include "ng-v2t.traefikOptionalHostRule" . }} PathPrefix(`/`)
+      match: {{ include "ng-speech.traefikOptionalHostRule" . }} PathPrefix(`/`)
       services:
-        - name: {{ include "ng-v2t.core" . }}
+        - name: {{ include "ng-speech.core" . }}
           port: http
     - kind: Rule
-      match: {{ include "ng-v2t.traefikOptionalHostRule" . }} Headers(`Content-Type`,`application/grpc`)
+      match: {{ include "ng-speech.traefikOptionalHostRule" . }} Headers(`Content-Type`,`application/grpc`)
       services:
-        - name: {{ include "ng-v2t.core" . }}
+        - name: {{ include "ng-speech.core" . }}
           port: grpc
           scheme: h2c
     - kind: Rule
-      match: {{ include "ng-v2t.traefikOptionalHostRule" . }} PathPrefix(`/dashboard`)
+      match: {{ include "ng-speech.traefikOptionalHostRule" . }} PathPrefix(`/dashboard`)
       services:
-        - name: {{ include "ng-v2t.dashboard" . }}
+        - name: {{ include "ng-speech.dashboard" . }}
           port: http
   {{- if .Values.traefikIngressRoute.tls.secretName }}
   tls:

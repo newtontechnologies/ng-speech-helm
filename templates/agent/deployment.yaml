@@ -2,16 +2,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "ng-v2t.agent" . }}
+  name: {{ include "ng-speech.agent" . }}
   labels:
-    {{- include "ng-v2t.labels" $ | nindent 4 }}
-    component: {{ include "ng-v2t.agent" . }}
+    {{- include "ng-speech.labels" $ | nindent 4 }}
+    component: {{ include "ng-speech.agent" . }}
 spec:
   replicas: {{ .Values.agent.replicaCount }}
   selector:
     matchLabels:
-      {{- include "ng-v2t.selectorLabels" $ | nindent 6 }}
-      component: {{ include "ng-v2t.agent" . }}
+      {{- include "ng-speech.selectorLabels" $ | nindent 6 }}
+      component: {{ include "ng-speech.agent" . }}
   {{- if .Values.agent.updateStrategy }}
   strategy: {{- toYaml .Values.agent.updateStrategy | nindent 4 }}
   {{- end }}
@@ -24,8 +24,8 @@ spec:
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/agent/secret.yaml") $ | sha256sum }}
       labels:
-        {{- include "ng-v2t.selectorLabels" $ | nindent 8 }}
-        component: {{ include "ng-v2t.agent" . }}
+        {{- include "ng-speech.selectorLabels" $ | nindent 8 }}
+        component: {{ include "ng-speech.agent" . }}
         {{- if .Values.agent.podLabels }}
         {{- include "common.tplvalues.render" (dict "value" .Values.agent.podLabels "context" $) | nindent 8 }}
         {{- end }}
@@ -33,7 +33,7 @@ spec:
       {{- if (or .Values.imagePullSecret.enabled .Values.global.imagePullSecrets) }}
       imagePullSecrets:
       {{- if .Values.imagePullSecret.enabled }}
-        - name: {{ include "ng-v2t.imagePullSecret" .}}
+        - name: {{ include "ng-speech.imagePullSecret" .}}
       {{- end }}
       {{- if .Values.global.imagePullSecrets }}
       {{- toYaml .Values.global.imagePullSecrets | nindent 8 }}
@@ -54,14 +54,14 @@ spec:
           {{- if .Values.agent.config.sharedWorkspace.enabled }}
             - "--workspace={{ .Values.agent.config.sharedWorkspace.dir }}"
           {{- end }}
-            - "--registry-endpoint={{- include "ng-v2t.core" $ }}:8081"
+            - "--registry-endpoint={{- include "ng-speech.core" $ }}:8081"
             - "--graceful-shutdown-timeout={{ .Values.agent.terminationGracePeriodSeconds }}s"
           {{- range .Values.agent.args }}
             - "{{ . }}"
           {{- end }}
           envFrom:
             - secretRef:
-                name: {{ include "ng-v2t.agentCfg" $ }}
+                name: {{ include "ng-speech.agentCfg" $ }}
             {{- if .Values.agent.extraEnvVarsCM }}
             - configMapRef:
                 name: {{ .Values.agent.extraEnvVarsCM }}
@@ -94,14 +94,14 @@ spec:
       {{- if .Values.agent.config.sharedWorkspace.enabled }}
         - name: workspace
           persistentVolumeClaim:
-            claimName: {{ include "ng-v2t.workspacePvc" $ }}
+            claimName: {{ include "ng-speech.workspacePvc" $ }}
       {{- end }}
       {{- if .Values.agent.affinity }}
       affinity: {{- include "common.tplvalues.render" (dict "value" .Values.agent.affinity "context" $) | nindent 8 }}
       {{- else }}
       affinity:
-        podAffinity: {{- include "common.affinities.pods" (dict "type" .Values.agent.podAffinityPreset "component" (include "ng-v2t.agent" .) "context" $) | nindent 10 }}
-        podAntiAffinity: {{- include "common.affinities.pods" (dict "type" .Values.agent.podAntiAffinityPreset "component" (include "ng-v2t.agent" .) "context" $) | nindent 10 }}
+        podAffinity: {{- include "common.affinities.pods" (dict "type" .Values.agent.podAffinityPreset "component" (include "ng-speech.agent" .) "context" $) | nindent 10 }}
+        podAntiAffinity: {{- include "common.affinities.pods" (dict "type" .Values.agent.podAntiAffinityPreset "component" (include "ng-speech.agent" .) "context" $) | nindent 10 }}
         nodeAffinity: {{- include "common.affinities.nodes" (dict "type" .Values.agent.nodeAffinityPreset.type "key" .Values.agent.nodeAffinityPreset.key "values" .Values.agent.nodeAffinityPreset.values) | nindent 10 }}
      {{- end }}
      {{- if .Values.agent.nodeSelector }}

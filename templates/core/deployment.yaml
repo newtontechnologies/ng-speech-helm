@@ -2,15 +2,15 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "ng-v2t.core" . }}
+  name: {{ include "ng-speech.core" . }}
   labels:
-    {{- include "ng-v2t.labels" . | nindent 4 }}
+    {{- include "ng-speech.labels" . | nindent 4 }}
     component: core
 spec:
   replicas: {{ .Values.core.replicaCount }}
   selector:
     matchLabels:
-      {{- include "ng-v2t.selectorLabels" . | nindent 6 }}
+      {{- include "ng-speech.selectorLabels" . | nindent 6 }}
       component: core
   {{- if .Values.core.updateStrategy }}
   strategy: {{- toYaml .Values.core.updateStrategy | nindent 4 }}
@@ -24,7 +24,7 @@ spec:
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/core/secret.yaml") . | sha256sum }}
       labels:
-        {{- include "ng-v2t.selectorLabels" . | nindent 8 }}
+        {{- include "ng-speech.selectorLabels" . | nindent 8 }}
         component: core
         {{- if .Values.core.podLabels }}
         {{- include "common.tplvalues.render" (dict "value" .Values.core.podLabels "context" $) | nindent 8 }}
@@ -33,7 +33,7 @@ spec:
       {{- if (or .Values.imagePullSecret.enabled .Values.global.imagePullSecrets) }}
       imagePullSecrets:
       {{- if .Values.imagePullSecret.enabled }}
-        - name: {{ include "ng-v2t.imagePullSecret" .}}
+        - name: {{ include "ng-speech.imagePullSecret" .}}
       {{- end }}
       {{- if .Values.global.imagePullSecrets }}
       {{- toYaml .Values.global.imagePullSecrets | nindent 8 }}
@@ -60,7 +60,7 @@ spec:
               containerPort: 8082
           envFrom:
             - secretRef:
-                name: {{ include "ng-v2t.coreCfg" .}}
+                name: {{ include "ng-speech.coreCfg" .}}
             {{- if .Values.core.extraEnvVarsCM }}
             - configMapRef:
                 name: {{ .Values.core.extraEnvVarsCM }}
@@ -92,13 +92,13 @@ spec:
         {{- if .Values.core.config.sharedWorkspace.enabled }}
         - name: workspace
           persistentVolumeClaim:
-            claimName: {{ include "ng-v2t.workspacePvc" . }}
+            claimName: {{ include "ng-speech.workspacePvc" . }}
         {{- end }}
         {{- if (eq .Values.core.config.history.type "fs") }}
         - name: history
         {{- if .Values.core.config.history.fs.persistence.enabled }}
           persistentVolumeClaim:
-            claimName: {{ include "ng-v2t.historyPvc" . }}
+            claimName: {{ include "ng-speech.historyPvc" . }}
         {{- else }}
           emptyDir:
         {{- end }}
@@ -106,7 +106,7 @@ spec:
         {{- if .Values.core.config.users }}
         - name: users
           secret:
-            secretName: {{ include "ng-v2t.usersCfg" .}}
+            secretName: {{ include "ng-speech.usersCfg" .}}
         {{- end }}
       {{- if .Values.core.affinity }}
       affinity: {{- include "common.tplvalues.render" (dict "value" .Values.core.affinity "context" $) | nindent 8 }}

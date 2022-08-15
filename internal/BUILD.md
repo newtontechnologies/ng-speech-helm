@@ -2,9 +2,9 @@
 
 1. Package
 ```shell
-helm package .
+helm package . -d docs
 ```
 2. Publish
 ```shell
-helm push ng-v2t-$(VERSION).tgz oci://docker.io/newtontechnologies/ng-v2t-helm
+helm push ng-speech.$(VERSION).tgz oci://docker.io/newtontechnologies/ng-speech.helm
 ```

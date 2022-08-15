@@ -2,17 +2,17 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ include "ng-v2t.etcd" . }}
+  name: {{ include "ng-speech.etcd" . }}
   labels:
-    {{- include "ng-v2t.labels" . | nindent 4 }}
+    {{- include "ng-speech.labels" . | nindent 4 }}
     component: etcd
 spec:
   replicas: {{ .Values.etcd.replicaCount }}
   selector:
     matchLabels:
-      {{- include "ng-v2t.selectorLabels" . | nindent 6 }}
+      {{- include "ng-speech.selectorLabels" . | nindent 6 }}
       component: etcd
-  serviceName: "{{- include "ng-v2t.etcdHeadlessService" . }}"
+  serviceName: "{{- include "ng-speech.etcdHeadlessService" . }}"
   template:
     metadata:
       annotations:
@@ -20,7 +20,7 @@ spec:
         {{- include "common.tplvalues.render" (dict "value" .Values.etcd.podAnnotations "context" $) | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "ng-v2t.selectorLabels" . | nindent 8 }}
+        {{- include "ng-speech.selectorLabels" . | nindent 8 }}
         component: etcd
         {{- if .Values.etcd.podLabels }}
         {{- include "common.tplvalues.render" (dict "value" .Values.etcd.podLabels "context" $) | nindent 8 }}
@@ -57,10 +57,10 @@ spec:
               exec etcd --name ${MY_POD_NAME} \
                 --listen-peer-urls http://0.0.0.0:2380 \
                 --listen-client-urls http://0.0.0.0:2379 \
-                --advertise-client-urls http://${MY_POD_NAME}.{{ include "ng-v2t.etcdHeadlessService" . }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:2379 \
-                --initial-advertise-peer-urls http://${MY_POD_NAME}.{{ include "ng-v2t.etcdHeadlessService" . }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:2380 \
-                --initial-cluster-token {{ include "ng-v2t.core" . }} \
-                --initial-cluster {{ include "ng-v2t.etcdPeers" . }} \
+                --advertise-client-urls http://${MY_POD_NAME}.{{ include "ng-speech.etcdHeadlessService" . }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:2379 \
+                --initial-advertise-peer-urls http://${MY_POD_NAME}.{{ include "ng-speech.etcdHeadlessService" . }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:2380 \
+                --initial-cluster-token {{ include "ng-speech.core" . }} \
+                --initial-cluster {{ include "ng-speech.etcdPeers" . }} \
                 --auto-compaction-mode {{ .Values.etcd.autoCompactionMode }} \
                 --auto-compaction-retention {{ .Values.etcd.autoCompactionRetention }} \
                 --initial-cluster-state new \

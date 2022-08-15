@@ -1,6 +1,6 @@
 apiVersion: v2
-name: ng-v2t
-description: A Helm chart for install Newton Technologies v2t platform
+name: ng-speech
+description: Newton Technologies Speech Services
 type: application
 version: 0.9.0-beta2
 appVersion: 0.9.0-beta4

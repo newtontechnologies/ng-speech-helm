@@ -2,9 +2,9 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: {{ include "ng-v2t.core" . }}
+  name: {{ include "ng-speech.core" . }}
   labels:
-    {{- include "ng-v2t.selectorLabels" . | nindent 4 }}
+    {{- include "ng-speech.selectorLabels" . | nindent 4 }}
     component: core
 spec:
   ports:
@@ -21,6 +21,6 @@ spec:
       port: 8082
       targetPort: monitor
   selector:
-    {{- include "ng-v2t.selectorLabels" . | nindent 4 }}
+    {{- include "ng-speech.selectorLabels" . | nindent 4 }}
     component: core
 {{- end }}
