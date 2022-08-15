@@ -2,7 +2,7 @@
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: {{ include "ng-speech.core" . }}
+  name: {{ include "ng-speech.etcd" . }}
 spec:
   {{- if .Values.etcd.pdb.minAvailable }}
   minAvailable: {{ .Values.etcd.pdb.minAvailable }}

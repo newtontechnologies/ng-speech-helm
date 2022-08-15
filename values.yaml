@@ -151,7 +151,7 @@ agent:
   enabled: true
   replicaCount: 1
   image:
-    repository: newtontechnologies/ng-speech.agent
+    repository: newtontechnologies/ng-speech-agent
     tag: ""
   updateStrategy:
     type: RollingUpdate
