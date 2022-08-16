@@ -61,13 +61,8 @@ spec:
           envFrom:
             - secretRef:
                 name: {{ include "ng-speech.coreCfg" .}}
-            {{- if .Values.core.extraEnvVarsCM }}
-            - configMapRef:
-                name: {{ .Values.core.extraEnvVarsCM }}
-            {{- end }}
-            {{- if .Values.core.extraEnvVarsSecret }}
-            - secretRef:
-                name: {{ .Values.core.extraEnvVarsSecret }}
+            {{- if .Values.agent.extraEnvFrom }}
+            {{ toYaml .Values.agent.extraEnvFrom | nindent 12 }}
             {{- end }}
           env:
           {{- with .Values.core.extraEnvVars }}

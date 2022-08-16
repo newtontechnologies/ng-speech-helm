@@ -62,13 +62,8 @@ spec:
           envFrom:
             - secretRef:
                 name: {{ include "ng-speech.agentCfg" $ }}
-            {{- if .Values.agent.extraEnvVarsCM }}
-            - configMapRef:
-                name: {{ .Values.agent.extraEnvVarsCM }}
-            {{- end }}
-            {{- if .Values.agent.extraEnvVarsSecret }}
-            - secretRef:
-                name: {{ .Values.agent.extraEnvVarsSecret }}
+            {{- if .Values.agent.extraEnvFrom }}
+            {{ toYaml .Values.agent.extraEnvFrom | nindent 12 }}
             {{- end }}
           env:
             - name: NG_NODE

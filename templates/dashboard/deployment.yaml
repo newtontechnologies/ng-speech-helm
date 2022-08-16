@@ -45,15 +45,11 @@ spec:
           ports:
             - name: http
               containerPort: 80
+          {{- if .Values.dashboard.extraEnvFrom }}
           envFrom:
-            {{- if .Values.dashboard.extraEnvVarsCM }}
-            - configMapRef:
-                name: {{ .Values.dashboard.extraEnvVarsCM }}
-            {{- end }}
-            {{- if .Values.dashboard.extraEnvVarsSecret }}
-            - secretRef:
-                name: {{ .Values.dashboard.extraEnvVarsSecret }}
-            {{- end }}
+            {{ toYaml .Values.agent.extraEnvFrom | nindent 12 }}
+          {{- end }}
+
           {{- if .Values.dashboard.args }}
           args:
             {{- range .Values.dashboard.args }}

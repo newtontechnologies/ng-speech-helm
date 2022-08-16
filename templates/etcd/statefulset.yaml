@@ -40,15 +40,12 @@ spec:
               name: client
             - containerPort: 2380
               name: peer
+
+          {{- if .Values.agent.extraEnvFrom }}
           envFrom:
-            {{- if .Values.etcd.extraEnvVarsCM }}
-            - configMapRef:
-                name: {{ .Values.etcd.extraEnvVarsCM }}
-            {{- end }}
-            {{- if .Values.etcd.extraEnvVarsSecret }}
-            - secretRef:
-                name: {{ .Values.etcd.extraEnvVarsSecret }}
-            {{- end }}
+          {{ toYaml .Values.agent.extraEnvFrom | nindent 12 }}
+          {{- end }}
+
           livenessProbe:  {{ .Values.etcd.livenessProbe | toYaml | nindent 12 }}
           args:
             - /bin/sh

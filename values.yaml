@@ -58,12 +58,12 @@ core:
         bucket: ""
     registry:
       token: "insecure-token"
-    users: []
-#     - name: user1
-#       password: $2a$12$JzH4Z.hZ1Q.5bMvO5wycq.dYpSzZYn36hVgAm2V3jemW/aT5njVXe # brycpt hash or plaintext
-#       permissions: [admin, monitor, ]
-#         - admin
-#       requestLimit: 128         # set to 0 for unlimited
+    users: [ ]
+    #     - name: user1
+    #       password: $2a$12$JzH4Z.hZ1Q.5bMvO5wycq.dYpSzZYn36hVgAm2V3jemW/aT5njVXe # brycpt hash or plaintext
+    #       permissions: [admin, monitor, ]
+    #         - admin
+    #       requestLimit: 128         # set to 0 for unlimited
 
     usersDir: /var/lib/ng/users
     sharedWorkspace:
@@ -76,8 +76,7 @@ core:
         size: 80Gi
   args: [ ]
   extraEnvVars: [ ]
-  extraEnvVarsSecret: ""
-  extraEnvVarsCM: ""
+  extraEnvFrom: [ ]
   podLabels: { }
   podAnnotations: { }
   resources:
@@ -120,8 +119,7 @@ dashboard:
   podAnnotations: { }
   args: [ ]
   extraEnvVars: [ ]
-  extraEnvVarsSecret: ""
-  extraEnvVarsCM: ""
+  extraEnvFrom: []
   terminationGracePeriodSeconds: 600
   podLabels: { }
   resources:
@@ -161,8 +159,7 @@ agent:
       dir: /var/lib/ng/shared-workspace
   args: [ ]
   extraEnvVars: [ ]
-  extraEnvVarsSecret: ""
-  extraEnvVarsCM: ""
+  extraEnvFrom: [ ]
   terminationGracePeriodSeconds: 600
   podLabels: { }
   podAnnotations: { }
@@ -210,8 +207,7 @@ etcd:
   podAnnotations: { }
   args: [ ]
   extraEnvVars: [ ]
-  extraEnvVarsSecret: ""
-  extraEnvVarsCM: ""
+  extraEnvFrom: [ ]
   terminationGracePeriodSeconds: 600
   podLabels: { }
   resources:
@@ -241,7 +237,7 @@ etcd:
     enabled: true
     storageClass: ""
     accessModes:
-      - ReadWriteMany
+      - ReadWriteOnce
     size: 10Gi
   livenessProbe:
     httpGet:
