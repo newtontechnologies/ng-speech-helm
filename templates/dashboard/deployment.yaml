@@ -47,7 +47,7 @@ spec:
               containerPort: 80
           {{- if .Values.dashboard.extraEnvFrom }}
           envFrom:
-            {{ toYaml .Values.agent.extraEnvFrom | nindent 12 }}
+            {{ toYaml .Values.core.extraEnvFrom | nindent 12 }}
           {{- end }}
 
           {{- if .Values.dashboard.args }}

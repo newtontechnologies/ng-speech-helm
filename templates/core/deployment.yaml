@@ -61,8 +61,8 @@ spec:
           envFrom:
             - secretRef:
                 name: {{ include "ng-speech.coreCfg" .}}
-            {{- if .Values.agent.extraEnvFrom }}
-            {{ toYaml .Values.agent.extraEnvFrom | nindent 12 }}
+            {{- if .Values.core.extraEnvFrom }}
+            {{ toYaml .Values.core.extraEnvFrom | nindent 12 }}
             {{- end }}
           env:
           {{- with .Values.core.extraEnvVars }}
