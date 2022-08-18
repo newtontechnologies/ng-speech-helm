@@ -41,21 +41,7 @@ core:
         username: ngadmin
         password: ngadmin
     history:
-      type: fs
-      fs:
-        dir: /var/lib/ng/history
-        persistence:
-          enabled: true
-          storageClass: ""
-          accessModes:
-            - ReadWriteMany
-          size: 80Gi
-      s3:
-        endpoint: ""
-        region: us-east-1
-        key: ""
-        secret: ""
-        bucket: ""
+      chunkLimit: 100
     registry:
       token: "insecure-token"
     users: [ ]

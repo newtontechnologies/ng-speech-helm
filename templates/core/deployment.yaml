@@ -69,10 +69,6 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           volumeMounts:
-          {{- if (eq .Values.core.config.history.type "fs") }}
-            - name: history
-              mountPath: {{ .Values.core.config.history.fs.dir }}
-          {{- end }}
           {{- if .Values.core.config.sharedWorkspace.enabled }}
             - name: workspace
               mountPath: {{ .Values.core.config.sharedWorkspace.dir }}
@@ -88,15 +84,6 @@ spec:
         - name: workspace
           persistentVolumeClaim:
             claimName: {{ include "ng-speech.workspacePvc" . }}
-        {{- end }}
-        {{- if (eq .Values.core.config.history.type "fs") }}
-        - name: history
-        {{- if .Values.core.config.history.fs.persistence.enabled }}
-          persistentVolumeClaim:
-            claimName: {{ include "ng-speech.historyPvc" . }}
-        {{- else }}
-          emptyDir:
-        {{- end }}
         {{- end }}
         {{- if .Values.core.config.users }}
         - name: users
