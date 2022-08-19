@@ -62,7 +62,6 @@ core:
         size: 80Gi
   args: [ ]
   extraEnvVars: [ ]
-  extraEnvFrom: [ ]
   podLabels: { }
   podAnnotations: { }
   resources:

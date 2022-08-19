@@ -40,16 +40,12 @@ spec:
               name: client
             - containerPort: 2380
               name: peer
-
           {{- if .Values.agent.extraEnvFrom }}
           envFrom:
           {{ toYaml .Values.agent.extraEnvFrom | nindent 12 }}
           {{- end }}
-
           livenessProbe:  {{ .Values.etcd.livenessProbe | toYaml | nindent 12 }}
           args:
-            - /bin/sh
-            - -c
             - |
               exec etcd --name ${MY_POD_NAME} \
                 --listen-peer-urls http://0.0.0.0:2380 \
@@ -62,7 +58,7 @@ spec:
                 --auto-compaction-retention {{ .Values.etcd.autoCompactionRetention }} \
                 --initial-cluster-state new \
                 --data-dir /var/run/etcd/default.etcd
-              {{- if .Values.etcd.args }}
+            {{- if .Values.etcd.args }}
             {{- range .Values.etcd.args }}
             - "{{ . }}"
             {{- end }}
