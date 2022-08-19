@@ -3,7 +3,26 @@ entries:
   ng-speech:
   - apiVersion: v2
     appVersion: 0.10.1
-    created: "2022-08-19T10:37:24.4519412+02:00"
+    created: "2022-08-19T11:09:07.8933338+02:00"
+    dependencies:
+    - name: common
+      repository: https://charts.bitnami.com/bitnami
+      version: 1.x.x
+    - condition: traefik.enabled
+      name: traefik
+      repository: https://helm.traefik.io/traefik
+      version: 10.x.x
+    description: Newton Technologies Speech Services
+    digest: 3c25ec89d4256b286563184eb4a9d413d5cc6ea902acdfb52d920a31916919a4
+    icon: https://www.newtontech.net/wp-content/uploads/2022/06/nt-ico-rgb.png
+    name: ng-speech
+    type: application
+    urls:
+    - https://newtontechnologies.github.io/ng-speech-helm/ng-speech-0.10.2.tgz
+    version: 0.10.2
+  - apiVersion: v2
+    appVersion: 0.10.1
+    created: "2022-08-19T11:09:07.8902587+02:00"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -22,7 +41,7 @@ entries:
     version: 0.10.1
   - apiVersion: v2
     appVersion: 0.10.0-beta1
-    created: "2022-08-19T10:37:24.449941+02:00"
+    created: "2022-08-19T11:09:07.8872593+02:00"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -41,7 +60,7 @@ entries:
     version: 0.10.0-beta1
   - apiVersion: v2
     appVersion: 0.9.0-beta6
-    created: "2022-08-19T10:37:24.4579414+02:00"
+    created: "2022-08-19T11:09:07.8983351+02:00"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -60,7 +79,7 @@ entries:
     version: 0.9.0-beta8
   - apiVersion: v2
     appVersion: 0.9.0-beta5
-    created: "2022-08-19T10:37:24.4559411+02:00"
+    created: "2022-08-19T11:09:07.8953342+02:00"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -77,4 +96,4 @@ entries:
     urls:
     - https://newtontechnologies.github.io/ng-speech-helm/ng-speech-0.9.0-beta7.tgz
     version: 0.9.0-beta7
-generated: "2022-08-19T10:37:24.4459395+02:00"
+generated: "2022-08-19T11:09:07.8842597+02:00"

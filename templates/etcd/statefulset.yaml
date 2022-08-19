@@ -46,6 +46,8 @@ spec:
           {{- end }}
           livenessProbe:  {{ .Values.etcd.livenessProbe | toYaml | nindent 12 }}
           args:
+            - /bin/sh
+            - -c
             - |
               exec etcd --name ${MY_POD_NAME} \
                 --listen-peer-urls http://0.0.0.0:2380 \
