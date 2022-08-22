@@ -21,8 +21,10 @@ spec:
       {{- if .Values.core.podAnnotations }}
         {{- include "common.tplvalues.render" (dict "value" .Values.core.podAnnotations "context" $) | nindent 8 }}
       {{- end }}
-      annotations:
-        checksum/config: {{ include (print $.Template.BasePath "/core/secret.yaml") . | sha256sum }}
+        checksum/core-secret: {{ include (print $.Template.BasePath "/core/secret.yaml") . | sha256sum }}
+      {{- if .Values.core.config.users }}
+        checksum/users-secret:   {{ include (print $.Template.BasePath "/core/users-secret.yaml") . | sha256sum }}
+      {{- end}}
       labels:
         {{- include "ng-speech.selectorLabels" . | nindent 8 }}
         component: core
