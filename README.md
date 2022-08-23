@@ -1,23 +1,18 @@
-
-
 # Newton V2T Helm package
 
-## Global prerequisites
-- Kubernetes cluster 1.22+
-- Helm v3.8.0+
-- Persistent volumes
+## Prerequisites
 
-**System does not store any user processed data**, only optionally persists diagnostic data.
+- Kubernetes cluster 1.21+
+- License token
 
-All input/output data is processed only as in-memory stream. 
+All input/output data is processed only as in-memory stream. System does not store or send any processed data.
 
 ## Components
 
 ### Core
 
 * API server, scheduler and gateway
-* Uses Etcd for runtime data
-* Stores historical data on filesystem or s3
+* Uses Etcd for data persistence
 
 ### Dashboard
 
@@ -25,54 +20,67 @@ All input/output data is processed only as in-memory stream.
 
 ### Agent
 
-* Scalable compute unit
-
-## Storage
+* Compute unit
 
 ### Etcd
 
-* Persistent KV store for *Core* runtime data. 
-* Supports HA by running in 3/5 nodes cluster.
-* Each instance requires persistent disk
+* Persistent KV store for *Core* runtime data.
 
-### History persistent volume
+### Traefik
 
-* Historical diagnostic and monitoring data
-
+* Optional service proxy
 
 ## Deployment modes
 
-### Single node setup with local path provisioner (e.g. k3s)
-
-* one *Etcd*, *Core* and *Dashboard* replica
-* number of *Agent* replicas based on resources required and available
+### Minimal configuration
 
 ```yaml
-global:
-  storageClass: local-path
-persistence:
-  accessModes:
-    - ReadWriteOnce
+core:
+  config:
+    license:
+      token: "_LICENSE_TOKEN_"
 ```
 
+### Highly available mode
 
-### Highly available distributed mode
-  
  ```yaml
-global:
-  storageClass: ceph-filesystem
 core:
   replicaCount: 2
 dashboard:
   replicaCount: 2
-agent:
-  replicaCount: 1
-etcd:  
+etcd:
   replicaCount: 3
 traefik:
   deployment:
     replicas: 2
 ```
 
+### Distributions
 
+```yaml
+agent:
+  image:
+    distribution: cz # distribution containing czech language service pack
+```
+
+See [ng-speech-agent](https://hub.docker.com/r/newtontechnologies/ng-speech-agent/tags) for list of all available
+options.
+
+## Configuration
+
+List of selected configuration options
+
+| Parameter                             | Description                                                                            | Default          |
+|---------------------------------------|----------------------------------------------------------------------------------------|------------------|
+| `core.config.license`                 | License token                                                                          | ``               |
+| `core.replicaCount`                   | Number of core replicas. Set to `2` for HA setup                                       | `1`              |
+| `core.config.admin.username`          | Admin username                                                                         | `ngadmin`        |
+| `core.config.admin.password`          | Admin password                                                                         | `ngadmin`        |
+| `core.config.login.jwt.key`           | Key used for symmetric JWT token encryption                                            | `insecure-key`   |
+| `core.config.registry.token`          | Token used for agent to core authentication                                            | `insecure-token` |
+| `core.config.history.chunkLimit`      | Number of history chunks to keep in etcd (single chunk stores ~ 1000 historic entries) | `100`            |
+| `core.config.sharedWorkspace.enabled` | Enables storing data on RWX shared volume,                                             | `false`          |
+| `agent.image.distribution`            | Agent image distribution                                                               | `all`            |
+| `agent.replicaCount`                  | Number of agent replicas. Each agent can handle single request at a time               | `1`              |
+| `traefikIngressRoute.enabled`         | Install Traefik IngressRoute for ingress traffic                                       | `true`           |
 

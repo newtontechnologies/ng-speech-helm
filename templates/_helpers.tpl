@@ -69,6 +69,16 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- printf "%s-agent" (include "ng-speech.fullname" .) -}}
 {{- end -}}
 
+{{- define "ng-speech.agentImage" -}}
+{{- with .Values.agent.image }}
+{{- if .distribution }}
+{{- printf "%s:%s-%v" .repository  (.tag | default $.Chart.AppVersion) .distribution }}
+{{- else -}}
+{{- printf "%s:%s" .repository  (.tag | default $.Chart.AppVersion) }}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
 {{- define "ng-speech.dashboard" -}}
 {{- printf "%s-dashboard" (include "ng-speech.fullname" .) -}}
 {{- end -}}
