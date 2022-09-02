@@ -96,7 +96,7 @@ dashboard:
   pathPrefix: /dashboard
   image:
     repository: newtontechnologies/ng-dashboard
-    tag: 0.9.0-beta0
+    tag: 0.9.0
   updateStrategy:
     type: RollingUpdate
   podAnnotations: { }
