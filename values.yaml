@@ -128,7 +128,7 @@ agent:
   image:
     repository: newtontechnologies/ng-speech-agent
     tag: ""
-    distribution: "all"
+    distribution: ""
   updateStrategy:
     type: RollingUpdate
   config:
