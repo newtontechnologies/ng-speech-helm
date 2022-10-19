@@ -65,10 +65,10 @@ core:
   podAnnotations: { }
   resources:
     requests:
-      cpu: 100m
-      memory: 512Mi
+      cpu: 250m
+      memory: 1Gi
     limits:
-      memory: 512Mi
+      memory: 1Gi
   affinity: { }
   ## Allowed values: `soft` or `hard`
   podAffinityPreset: ""
@@ -176,7 +176,7 @@ etcd:
   image:
     registry: quay.io
     repository: coreos/etcd
-    tag: v3.5.4
+    tag: v3.5.5
   updateStrategy:
     type: RollingUpdate
   podAnnotations: { }
@@ -188,9 +188,9 @@ etcd:
   resources:
     requests:
       cpu: 100m
-      memory: 1Gi
+      memory: 2Gi
     limits:
-      memory: 1Gi
+      memory: 2Gi
   affinity: { }
   ## Allowed values: `soft` or `hard`
   podAffinityPreset: ""
