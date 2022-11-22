@@ -3,7 +3,6 @@ nameOverride: ""
 fullnameOverride: ""
 
 imagePullPolicy: IfNotPresent
-clusterDomain: cluster.local
 
 global:
   storageClass: ""
@@ -17,19 +16,13 @@ imagePullSecret:
   email: "nobody@email.com"
 
 core:
-  enabled: true
-  replicaCount: 1
   image:
     repository: newtontechnologies/ng-core
     tag: ""
+    distribution: ""
   updateStrategy:
     type: RollingUpdate
   config:
-    etcd:
-      endpoint: ""
-      username: ""
-      password: ""
-      namespace: "ng-v1"
     license:
       token: ""
     login:
@@ -40,10 +33,10 @@ core:
       admin:
         username: ngadmin
         password: ngadmin
-    history:
-      chunkLimit: 100
-    registry:
+    agent:
       token: "insecure-token"
+      # number of embedded agents
+      count: 0
     users: [ ]
     # users:
     #   - name: user1
@@ -56,61 +49,19 @@ core:
       dir: /var/lib/ng/shared-workspace
       persistence:
         storageClass: ""
-        accessModes:
-          - ReadWriteMany
         size: 80Gi
+    history:
+      dir: /var/lib/ng/history
+      persistence:
+        enabled: false
+        storageClass: ""
+        size: 10Gi
   args: [ ]
   extraEnvVars: [ ]
   podLabels: { }
   podAnnotations: { }
-  resources:
-    requests:
-      cpu: 100m
-      memory: 512Mi
-    limits:
-      memory: 512Mi
-  affinity: { }
-  ## Allowed values: `soft` or `hard`
-  podAffinityPreset: ""
-  ## Allowed values: `soft` or `hard`
-  podAntiAffinityPreset: soft
-  nodeAffinityPreset:
-    ## Allowed values: `soft` or `hard`
-    type: ""
-    key: ""
-    values: [ ]
-  nodeSelector: { }
-  priorityClassName: ""
-  schedulerName: ""
-  automountServiceAccountToken: false
-  tolerations: [ ]
-  terminationGracePeriodSeconds: 600
-  pdb:
-    enabled: true
-    minAvailable: 1
-    maxUnavailable: ""
-
-dashboard:
-  enabled: true
-  replicaCount: 1
-  pathPrefix: /dashboard
-  image:
-    repository: newtontechnologies/ng-dashboard
-    tag: 0.9.0
-  updateStrategy:
-    type: RollingUpdate
-  podAnnotations: { }
-  args: [ ]
-  extraEnvVars: [ ]
-  extraEnvFrom: [ ]
-  terminationGracePeriodSeconds: 600
-  podLabels: { }
   resources: { }
   affinity: { }
-  ## Allowed values: `soft` or `hard`
-  podAffinityPreset: ""
-  ## Allowed values: `soft` or `hard`
-  podAntiAffinityPreset: soft
   nodeAffinityPreset:
     ## Allowed values: `soft` or `hard`
     type: ""
@@ -121,12 +72,13 @@ dashboard:
   schedulerName: ""
   automountServiceAccountToken: false
   tolerations: [ ]
+  terminationGracePeriodSeconds: 600
 
-agent:
-  enabled: true
-  replicaCount: 1
+# external agents
+externalAgent:
+  replicas: 0
   image:
-    repository: newtontechnologies/ng-speech-agent
+    repository: newtontechnologies/ng-core
     tag: ""
     distribution: ""
   updateStrategy:
@@ -167,65 +119,6 @@ agent:
 
 serviceMonitor:
   enabled: false
-
-etcd:
-  enabled: true
-  replicaCount: 1
-  autoCompactionMode: periodic
-  autoCompactionRetention: 10m
-  image:
-    registry: quay.io
-    repository: coreos/etcd
-    tag: v3.5.4
-  updateStrategy:
-    type: RollingUpdate
-  podAnnotations: { }
-  args: [ ]
-  extraEnvVars: [ ]
-  extraEnvFrom: [ ]
-  terminationGracePeriodSeconds: 600
-  podLabels: { }
-  resources:
-    requests:
-      cpu: 100m
-      memory: 1Gi
-    limits:
-      memory: 1Gi
-  affinity: { }
-  ## Allowed values: `soft` or `hard`
-  podAffinityPreset: ""
-  ## Allowed values: `soft` or `hard`
-  podAntiAffinityPreset: soft
-  nodeAffinityPreset:
-    ## Allowed values: `soft` or `hard`
-    type: ""
-    key: ""
-    values: [ ]
-  nodeSelector: { }
-  priorityClassName: ""
-  schedulerName: ""
-  automountServiceAccountToken: false
-  tolerations: [ ]
-  podManagementPolicy: Parallel
-  persistence:
-    enabled: true
-    storageClass: ""
-    accessModes:
-      - ReadWriteOnce
-    size: 10Gi
-  livenessProbe:
-    httpGet:
-      path: /metrics
-      port: client
-    initialDelaySeconds: 15
-    periodSeconds: 10
-    successThreshold: 1
-    failureThreshold: 5
-    timeoutSeconds: 5
-  pdb:
-    enabled: true
-    minAvailable: "51%"
-    maxUnavailable: ""
 
 traefikIngressRoute:
   enabled: true

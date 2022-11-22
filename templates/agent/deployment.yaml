@@ -1,4 +1,4 @@
-{{- if .Values.agent.enabled }}
+{{- if (gt .Values.externalAgent.replicas  0) }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -7,26 +7,26 @@ metadata:
     {{- include "ng-speech.labels" $ | nindent 4 }}
     component: {{ include "ng-speech.agent" . }}
 spec:
-  replicas: {{ .Values.agent.replicaCount }}
+  replicas: {{ .Values.externalAgent.replicas }}
   selector:
     matchLabels:
       {{- include "ng-speech.selectorLabels" $ | nindent 6 }}
       component: {{ include "ng-speech.agent" . }}
-  {{- if .Values.agent.updateStrategy }}
-  strategy: {{- toYaml .Values.agent.updateStrategy | nindent 4 }}
+  {{- if .Values.externalAgent.updateStrategy }}
+  strategy: {{- toYaml .Values.externalAgent.updateStrategy | nindent 4 }}
   {{- end }}
   template:
     metadata:
       annotations:
-      {{- if .Values.agent.podAnnotations }}
-        {{- include "common.tplvalues.render" (dict "value" .Values.agent.podAnnotations "context" $) | nindent 8 }}
+      {{- if .Values.externalAgent.podAnnotations }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.externalAgent.podAnnotations "context" $) | nindent 8 }}
       {{- end }}
         checksum/agent-secret: {{ include (print $.Template.BasePath "/agent/secret.yaml") $ | sha256sum }}
       labels:
         {{- include "ng-speech.selectorLabels" $ | nindent 8 }}
         component: {{ include "ng-speech.agent" . }}
-        {{- if .Values.agent.podLabels }}
-        {{- include "common.tplvalues.render" (dict "value" .Values.agent.podLabels "context" $) | nindent 8 }}
+        {{- if .Values.externalAgent.podLabels }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.externalAgent.podLabels "context" $) | nindent 8 }}
         {{- end }}
     spec:
       {{- if (or .Values.imagePullSecret.enabled .Values.global.imagePullSecrets) }}
@@ -38,8 +38,8 @@ spec:
       {{- toYaml .Values.global.imagePullSecrets | nindent 8 }}
       {{- end }}
       {{- end }}
-      automountServiceAccountToken: {{ .Values.agent.automountServiceAccountToken }}
-      terminationGracePeriodSeconds: {{ .Values.agent.terminationGracePeriodSeconds }}
+      automountServiceAccountToken: {{ .Values.externalAgent.automountServiceAccountToken }}
+      terminationGracePeriodSeconds: {{ .Values.externalAgent.terminationGracePeriodSeconds }}
       containers:
         - name: agent
           image: {{ include "ng-speech.agentImage" . }}
@@ -50,19 +50,19 @@ spec:
             - name: grpc-api
               containerPort: 8081
           args:
-          {{- if .Values.agent.config.sharedWorkspace.enabled }}
-            - "--workspace={{ .Values.agent.config.sharedWorkspace.dir }}"
+          {{- if .Values.externalAgent.config.sharedWorkspace.enabled }}
+            - "--workspace={{ .Values.externalAgent.config.sharedWorkspace.dir }}"
           {{- end }}
             - "--registry-endpoint={{- include "ng-speech.core" $ }}:8081"
-            - "--graceful-shutdown-timeout={{ .Values.agent.terminationGracePeriodSeconds }}s"
-          {{- range .Values.agent.args }}
+            - "--graceful-shutdown-timeout={{ .Values.externalAgent.terminationGracePeriodSeconds }}s"
+          {{- range .Values.externalAgent.args }}
             - "{{ . }}"
           {{- end }}
           envFrom:
             - secretRef:
                 name: {{ include "ng-speech.agentCfg" $ }}
-            {{- if .Values.agent.extraEnvFrom }}
-            {{ toYaml .Values.agent.extraEnvFrom | nindent 12 }}
+            {{- if .Values.externalAgent.extraEnvFrom }}
+            {{ toYaml .Values.externalAgent.extraEnvFrom | nindent 12 }}
             {{- end }}
           env:
             - name: NG_NODE
@@ -73,41 +73,41 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: status.podIP
-          {{- if .Values.agent.extraEnvVars }}
-          {{- toYaml .Values.agent.extraEnvVars | nindent 12 }}
+          {{- if .Values.externalAgent.extraEnvVars }}
+          {{- toYaml .Values.externalAgent.extraEnvVars | nindent 12 }}
           {{- end }}
           resources:
-            {{- toYaml .Values.agent.resources | nindent 12 }}
-          {{- if .Values.agent.config.sharedWorkspace.enabled }}
+            {{- toYaml .Values.externalAgent.resources | nindent 12 }}
+          {{- if .Values.externalAgent.config.sharedWorkspace.enabled }}
           volumeMounts:
             - name: workspace
-              mountPath: {{ .Values.agent.config.sharedWorkspace.dir }}
+              mountPath: {{ .Values.externalAgent.config.sharedWorkspace.dir }}
               readOnly: true
           {{- end }}
       volumes:
-      {{- if .Values.agent.config.sharedWorkspace.enabled }}
+      {{- if .Values.externalAgent.config.sharedWorkspace.enabled }}
         - name: workspace
           persistentVolumeClaim:
             claimName: {{ include "ng-speech.workspacePvc" $ }}
       {{- end }}
-      {{- if .Values.agent.affinity }}
-      affinity: {{- include "common.tplvalues.render" (dict "value" .Values.agent.affinity "context" $) | nindent 8 }}
+      {{- if .Values.externalAgent.affinity }}
+      affinity: {{- include "common.tplvalues.render" (dict "value" .Values.externalAgent.affinity "context" $) | nindent 8 }}
       {{- else }}
       affinity:
-        podAffinity: {{- include "common.affinities.pods" (dict "type" .Values.agent.podAffinityPreset "component" (include "ng-speech.agent" .) "context" $) | nindent 10 }}
-        podAntiAffinity: {{- include "common.affinities.pods" (dict "type" .Values.agent.podAntiAffinityPreset "component" (include "ng-speech.agent" .) "context" $) | nindent 10 }}
-        nodeAffinity: {{- include "common.affinities.nodes" (dict "type" .Values.agent.nodeAffinityPreset.type "key" .Values.agent.nodeAffinityPreset.key "values" .Values.agent.nodeAffinityPreset.values) | nindent 10 }}
+        podAffinity: {{- include "common.affinities.pods" (dict "type" .Values.externalAgent.podAffinityPreset "component" (include "ng-speech.agent" .) "context" $) | nindent 10 }}
+        podAntiAffinity: {{- include "common.affinities.pods" (dict "type" .Values.externalAgent.podAntiAffinityPreset "component" (include "ng-speech.agent" .) "context" $) | nindent 10 }}
+        nodeAffinity: {{- include "common.affinities.nodes" (dict "type" .Values.externalAgent.nodeAffinityPreset.type "key" .Values.externalAgent.nodeAffinityPreset.key "values" .Values.externalAgent.nodeAffinityPreset.values) | nindent 10 }}
      {{- end }}
-     {{- if .Values.agent.nodeSelector }}
-      nodeSelector: {{- include "common.tplvalues.render" (dict "value" .Values.agent.nodeSelector "context" $) | nindent 8 }}
+     {{- if .Values.externalAgent.nodeSelector }}
+      nodeSelector: {{- include "common.tplvalues.render" (dict "value" .Values.externalAgent.nodeSelector "context" $) | nindent 8 }}
      {{- end }}
-     {{- if .Values.agent.tolerations }}
-      tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.agent.tolerations "context" $) | nindent 8 }}
+     {{- if .Values.externalAgent.tolerations }}
+      tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.externalAgent.tolerations "context" $) | nindent 8 }}
      {{- end }}
-     {{- if .Values.agent.priorityClassName }}
-      priorityClassName: {{ .Values.agent.priorityClassName | quote }}
+     {{- if .Values.externalAgent.priorityClassName }}
+      priorityClassName: {{ .Values.externalAgent.priorityClassName | quote }}
      {{- end }}
-     {{- if .Values.agent.schedulerName }}
-      schedulerName: {{ .Values.agent.schedulerName }}
+     {{- if .Values.externalAgent.schedulerName }}
+      schedulerName: {{ .Values.externalAgent.schedulerName }}
      {{- end }}
 {{- end }}

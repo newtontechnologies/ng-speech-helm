@@ -1,9 +1,9 @@
 dependencies:
 - name: common
   repository: https://charts.bitnami.com/bitnami
-  version: 1.16.1
+  version: 2.2.0
 - name: traefik
   repository: https://helm.traefik.io/traefik
-  version: 10.24.0
-digest: sha256:7f75b7c4c6beb331afd4f3c36016e50dab4ef52b1c7a2ad4346a2101448e38a3
-generated: "2022-08-09T09:28:17.4108335+02:00"
+  version: 20.4.1
+digest: sha256:c624cb84db371e2aaa43b6a784899342888a94ce6256e73f2b041e149da44bb0
+generated: "2022-11-22T20:39:49.2083235+01:00"

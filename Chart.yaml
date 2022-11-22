@@ -8,8 +8,8 @@ icon: https://www.newtontech.net/wp-content/uploads/2022/06/nt-ico-rgb.png
 dependencies:
   - name: common
     repository: https://charts.bitnami.com/bitnami
-    version: 1.x.x
+    version: 2.2.x
   - name: traefik
     repository: https://helm.traefik.io/traefik
-    version: 10.x.x
+    version: 20.4.x
     condition: traefik.enabled
