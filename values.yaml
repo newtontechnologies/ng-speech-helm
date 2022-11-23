@@ -45,11 +45,11 @@ core:
     #     requestLimit: 128         # set to 0 for unlimited
     usersDir: /var/lib/ng/users
     sharedWorkspace:
-      enabled: false
       dir: /var/lib/ng/shared-workspace
       persistence:
+        enabled: false
         storageClass: ""
-        size: 80Gi
+        size: 40Gi
     history:
       dir: /var/lib/ng/history
       persistence:
@@ -74,9 +74,9 @@ core:
   tolerations: [ ]
   terminationGracePeriodSeconds: 600
 
-# external agents
-externalAgent:
-  replicas: 0
+# agents
+agent:
+  count: 0
   image:
     repository: newtontechnologies/ng-core
     tag: ""
@@ -130,7 +130,7 @@ traefikIngressRoute:
     - web
 
 traefik:
-  enabled: true
+  enabled: false
   resources:
     requests:
       cpu: 100m

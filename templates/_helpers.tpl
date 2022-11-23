@@ -80,7 +80,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 
 {{- define "ng-speech.agentImage" -}}
-{{- with .Values.externalAgent.image }}
+{{- with .Values.agent.image }}
 {{- if .distribution }}
 {{- printf "%s:%s-%v" .repository  (.tag | default $.Chart.AppVersion) .distribution }}
 {{- else -}}

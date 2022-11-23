@@ -6,7 +6,11 @@ metadata:
   name: "{{ include "ng-speech.workspacePvc" $ }}"
 spec:
   accessModes:
+{{- if (gt (int $.Values.agent.count)  0) }}
     - ReadWriteMany
+{{- else }}
+    - ReadWriteOnce
+{{- end }}
   resources:
     requests:
       storage: {{ .size }}

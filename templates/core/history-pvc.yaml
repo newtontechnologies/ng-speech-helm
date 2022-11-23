@@ -1,5 +1,5 @@
-{{- if .Values.core.config.history.persistence.enabled }}
-{{- with .Values.core.config.sharedWorkspace.persistence }}
+{{- with .Values.core.config.history.persistence }}
+{{-if .enabled }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
