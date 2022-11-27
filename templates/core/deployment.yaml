@@ -21,6 +21,9 @@ spec:
         {{- include "common.tplvalues.render" (dict "value" .Values.core.podAnnotations "context" $) | nindent 8 }}
       {{- end }}
         checksum/core-secret: {{ include (print $.Template.BasePath "/core/secret.yaml") . | sha256sum }}
+      {{- if .Values.core.config.users }}
+        checksum/users-secret: {{ include (print $.Template.BasePath "/core/users-secret.yaml") . | sha256sum }}
+      {{- end }}
       labels:
         {{- include "ng-speech.selectorLabels" . | nindent 8 }}
         component: core
@@ -67,10 +70,8 @@ spec:
           volumeMounts:
             - name: history
               mountPath: {{ .Values.core.config.history.dir }}
-          {{- if .Values.core.config.sharedWorkspace.enabled }}
             - name: workspace
               mountPath: {{ .Values.core.config.sharedWorkspace.dir }}
-          {{- end }}
           {{- if .Values.core.config.users }}
             - name: users
               mountPath: {{ .Values.core.config.usersDir }}
@@ -78,17 +79,19 @@ spec:
           resources:
             {{- toYaml .Values.core.resources | nindent 12 }}
       volumes:
-        {{- if .Values.core.config.sharedWorkspace.enabled }}
         - name: workspace
+        {{- if .Values.core.config.sharedWorkspace.persistence.enabled }}
           persistentVolumeClaim:
             claimName: {{ include "ng-speech.workspacePvc" . }}
+        {{- else }}
+          emptyDir:
+            sizeLimit: {{ .Values.core.config.sharedWorkspace.persistence.size }}
         {{- end }}
-        {{- if .Values.core.config.history.persistence.enabled }}
         - name: history
+        {{- if .Values.core.config.history.persistence.enabled }}
           persistentVolumeClaim:
             claimName: {{ include "ng-speech.historyPvc" . }}
         {{- else }}
-        - name: history
           emptyDir:
             sizeLimit: {{ .Values.core.config.history.persistence.size }}
         {{- end }}

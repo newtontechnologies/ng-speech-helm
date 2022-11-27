@@ -1,16 +1,12 @@
-{{- if .Values.core.config.sharedWorkspace.enabled }}
 {{- with .Values.core.config.sharedWorkspace.persistence }}
+{{- if .enabled }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: "{{ include "ng-speech.workspacePvc" $ }}"
 spec:
   accessModes:
-{{- if (gt (int $.Values.agent.count)  0) }}
     - ReadWriteMany
-{{- else }}
-    - ReadWriteOnce
-{{- end }}
   resources:
     requests:
       storage: {{ .size }}
