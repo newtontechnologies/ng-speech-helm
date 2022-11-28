@@ -20,7 +20,7 @@ core:
     repository: newtontechnologies/ng-core
     tag: ""
     distribution: ""
-  updateStrategy:
+  strategy:
     type: Recreate
   config:
     license:
@@ -73,6 +73,18 @@ core:
   automountServiceAccountToken: false
   tolerations: [ ]
   terminationGracePeriodSeconds: 600
+  readinessProbe:
+    failureThreshold: 1
+    initialDelaySeconds: 2
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 2
+  livenessProbe:
+    failureThreshold: 3
+    initialDelaySeconds: 2
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 2
 
 agent:
   default:
@@ -116,6 +128,18 @@ agent:
       enabled: true
       minAvailable: ""
       maxUnavailable: "25%"
+    readinessProbe:
+      failureThreshold: 1
+      initialDelaySeconds: 2
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 2
+    livenessProbe:
+      failureThreshold: 3
+      initialDelaySeconds: 2
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 2
 
 
 serviceMonitor:

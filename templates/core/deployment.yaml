@@ -78,6 +78,16 @@ spec:
           {{- end}}
           resources:
             {{- toYaml .Values.core.resources | nindent 12 }}
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8082
+            {{- toYaml .Values.core.readinessProbe | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8082
+            {{- toYaml .Values.core.livenessProbe | nindent 12 }}
       volumes:
         - name: workspace
         {{- if .Values.core.config.sharedWorkspace.persistence.enabled }}

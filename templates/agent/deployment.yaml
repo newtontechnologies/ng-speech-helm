@@ -99,6 +99,16 @@ spec:
               mountPath: {{ $agent.config.sharedWorkspace.dir }}
               readOnly: true
           {{- end }}
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            {{- toYaml $agent.readinessProbe | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            {{- toYaml $agent.livenessProbe | nindent 12 }}
       volumes:
       {{- if ($agent.config).sharedWorkspace.enabled }}
         - name: workspace
