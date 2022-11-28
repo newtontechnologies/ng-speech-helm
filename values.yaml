@@ -27,14 +27,14 @@ core:
       token: ""
     login:
       jwt:
-        key: "insecure-key"
+        key: ""
         audience: ""
         ttl: "4h"
       admin:
         username: ngadmin
         password: ngadmin
     agent:
-      token: "insecure-token"
+      token: ""
       # number of embedded agents
       count: 0
     users: [ ]
@@ -76,7 +76,7 @@ core:
 
 agent:
   default:
-    count: 3
+    count: 0
     image:
       repository: newtontechnologies/ng-core
       tag: ""
