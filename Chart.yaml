@@ -2,14 +2,14 @@ apiVersion: v2
 name: ng-speech
 description: Newton Technologies Speech Services
 type: application
-version: 0.10.8
-appVersion: 0.10.4
+version: 2.0.2
+appVersion: 2.0.1
 icon: https://www.newtontech.net/wp-content/uploads/2022/06/nt-ico-rgb.png
 dependencies:
   - name: common
     repository: https://charts.bitnami.com/bitnami
-    version: 1.x.x
+    version: 2.2.x
   - name: traefik
     repository: https://helm.traefik.io/traefik
-    version: 10.x.x
+    version: 20.4.x
     condition: traefik.enabled

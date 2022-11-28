@@ -3,7 +3,6 @@ nameOverride: ""
 fullnameOverride: ""
 
 imagePullPolicy: IfNotPresent
-clusterDomain: cluster.local
 
 global:
   storageClass: ""
@@ -17,33 +16,27 @@ imagePullSecret:
   email: "nobody@email.com"
 
 core:
-  enabled: true
-  replicaCount: 1
   image:
     repository: newtontechnologies/ng-core
     tag: ""
+    distribution: ""
   updateStrategy:
-    type: RollingUpdate
+    type: Recreate
   config:
-    etcd:
-      endpoint: ""
-      username: ""
-      password: ""
-      namespace: "ng-v1"
     license:
       token: ""
     login:
       jwt:
-        key: "insecure-key"
+        key: ""
         audience: ""
         ttl: "4h"
       admin:
         username: ngadmin
         password: ngadmin
-    history:
-      chunkLimit: 100
-    registry:
-      token: "insecure-token"
+    agent:
+      token: ""
+      # number of embedded agents
+      count: 0
     users: [ ]
     # users:
     #   - name: user1
@@ -52,65 +45,23 @@ core:
     #     requestLimit: 128         # set to 0 for unlimited
     usersDir: /var/lib/ng/users
     sharedWorkspace:
-      enabled: false
       dir: /var/lib/ng/shared-workspace
       persistence:
+        enabled: false
         storageClass: ""
-        accessModes:
-          - ReadWriteMany
-        size: 80Gi
+        size: 40Gi
+    history:
+      dir: /var/lib/ng/history
+      persistence:
+        enabled: false
+        storageClass: ""
+        size: 10Gi
   args: [ ]
   extraEnvVars: [ ]
   podLabels: { }
   podAnnotations: { }
-  resources:
-    requests:
-      cpu: 250m
-      memory: 1Gi
-    limits:
-      memory: 1Gi
-  affinity: { }
-  ## Allowed values: `soft` or `hard`
-  podAffinityPreset: ""
-  ## Allowed values: `soft` or `hard`
-  podAntiAffinityPreset: soft
-  nodeAffinityPreset:
-    ## Allowed values: `soft` or `hard`
-    type: ""
-    key: ""
-    values: [ ]
-  nodeSelector: { }
-  priorityClassName: ""
-  schedulerName: ""
-  automountServiceAccountToken: false
-  tolerations: [ ]
-  terminationGracePeriodSeconds: 600
-  pdb:
-    enabled: true
-    minAvailable: 1
-    maxUnavailable: ""
-
-dashboard:
-  enabled: true
-  replicaCount: 1
-  pathPrefix: /dashboard
-  image:
-    repository: newtontechnologies/ng-dashboard
-    tag: 0.9.1
-  updateStrategy:
-    type: RollingUpdate
-  podAnnotations: { }
-  args: [ ]
-  extraEnvVars: [ ]
-  extraEnvFrom: [ ]
-  terminationGracePeriodSeconds: 600
-  podLabels: { }
   resources: { }
   affinity: { }
-  ## Allowed values: `soft` or `hard`
-  podAffinityPreset: ""
-  ## Allowed values: `soft` or `hard`
-  podAntiAffinityPreset: soft
   nodeAffinityPreset:
     ## Allowed values: `soft` or `hard`
     type: ""
@@ -121,111 +72,54 @@ dashboard:
   schedulerName: ""
   automountServiceAccountToken: false
   tolerations: [ ]
+  terminationGracePeriodSeconds: 600
 
 agent:
-  enabled: true
-  replicaCount: 1
-  image:
-    repository: newtontechnologies/ng-speech-agent
-    tag: ""
-    distribution: ""
-  updateStrategy:
-    type: RollingUpdate
-  config:
-    sharedWorkspace:
-      enabled: false
-      dir: /var/lib/ng/shared-workspace
-  args: [ ]
-  extraEnvVars: [ ]
-  extraEnvFrom: [ ]
-  terminationGracePeriodSeconds: 600
-  podLabels: { }
-  podAnnotations: { }
-  resources:
-    requests:
-      cpu: 1
-      memory: 3Gi
-  affinity: { }
-  ## Allowed values: `soft` or `hard`
-  podAffinityPreset: ""
-  ## Allowed values: `soft` or `hard`
-  podAntiAffinityPreset: soft
-  nodeAffinityPreset:
+  default:
+    count: 0
+    image:
+      repository: newtontechnologies/ng-core
+      tag: ""
+      distribution: ""
+    updateStrategy:
+      type: RollingUpdate
+    config:
+      sharedWorkspace:
+        enabled: false
+        dir: /var/lib/ng/shared-workspace
+    args: [ ]
+    extraEnvVars: [ ]
+    extraEnvFrom: [ ]
+    terminationGracePeriodSeconds: 600
+    podLabels: { }
+    podAnnotations: { }
+    resources:
+      requests:
+        cpu: 1
+        memory: 3Gi
+    affinity: { }
     ## Allowed values: `soft` or `hard`
-    type: ""
-    key: ""
-    values: [ ]
-  nodeSelector: { }
-  priorityClassName: ""
-  schedulerName: ""
-  automountServiceAccountToken: false
-  tolerations: [ ]
-  pdb:
-    enabled: true
-    minAvailable: ""
-    maxUnavailable: "25%"
+    podAffinityPreset: ""
+    ## Allowed values: `soft` or `hard`
+    podAntiAffinityPreset: soft
+    nodeAffinityPreset:
+      ## Allowed values: `soft` or `hard`
+      type: ""
+      key: ""
+      values: [ ]
+    nodeSelector: { }
+    priorityClassName: ""
+    schedulerName: ""
+    automountServiceAccountToken: false
+    tolerations: [ ]
+    pdb:
+      enabled: true
+      minAvailable: ""
+      maxUnavailable: "25%"
+
 
 serviceMonitor:
   enabled: false
-
-etcd:
-  enabled: true
-  replicaCount: 1
-  autoCompactionMode: periodic
-  autoCompactionRetention: 10m
-  image:
-    registry: quay.io
-    repository: coreos/etcd
-    tag: v3.5.5
-  updateStrategy:
-    type: RollingUpdate
-  podAnnotations: { }
-  args: [ ]
-  extraEnvVars: [ ]
-  extraEnvFrom: [ ]
-  terminationGracePeriodSeconds: 600
-  podLabels: { }
-  resources:
-    requests:
-      cpu: 100m
-      memory: 2Gi
-    limits:
-      memory: 2Gi
-  affinity: { }
-  ## Allowed values: `soft` or `hard`
-  podAffinityPreset: ""
-  ## Allowed values: `soft` or `hard`
-  podAntiAffinityPreset: soft
-  nodeAffinityPreset:
-    ## Allowed values: `soft` or `hard`
-    type: ""
-    key: ""
-    values: [ ]
-  nodeSelector: { }
-  priorityClassName: ""
-  schedulerName: ""
-  automountServiceAccountToken: false
-  tolerations: [ ]
-  podManagementPolicy: Parallel
-  persistence:
-    enabled: true
-    storageClass: ""
-    accessModes:
-      - ReadWriteOnce
-    size: 10Gi
-  livenessProbe:
-    httpGet:
-      path: /metrics
-      port: client
-    initialDelaySeconds: 15
-    periodSeconds: 10
-    successThreshold: 1
-    failureThreshold: 5
-    timeoutSeconds: 5
-  pdb:
-    enabled: true
-    minAvailable: "51%"
-    maxUnavailable: ""
 
 traefikIngressRoute:
   enabled: true
@@ -237,7 +131,7 @@ traefikIngressRoute:
     - web
 
 traefik:
-  enabled: true
+  enabled: false
   resources:
     requests:
       cpu: 100m

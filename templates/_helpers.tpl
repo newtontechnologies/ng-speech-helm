@@ -60,17 +60,17 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- printf "%s-treafik" (include "ng-speech.fullname" . ) -}}
 {{- end -}}
 
-
 {{- define "ng-speech.agent" -}}
 {{- printf "%s-agent" (include "ng-speech.fullname" .) -}}
 {{- end -}}
+
 
 {{- define "ng-speech.agentCfg" -}}
 {{- printf "%s-agent" (include "ng-speech.fullname" .) -}}
 {{- end -}}
 
-{{- define "ng-speech.agentImage" -}}
-{{- with .Values.agent.image }}
+{{- define "ng-speech.coreImage" -}}
+{{- with .Values.core.image }}
 {{- if .distribution }}
 {{- printf "%s:%s-%v" .repository  (.tag | default $.Chart.AppVersion) .distribution }}
 {{- else -}}
@@ -79,9 +79,14 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 {{- end -}}
 
-{{- define "ng-speech.dashboard" -}}
-{{- printf "%s-dashboard" (include "ng-speech.fullname" .) -}}
+{{- define "ng-speech.agentImage" -}}
+{{- if .image.distribution }}
+{{- printf "%s:%s-%v" .image.repository  (.image.tag | default .Chart.AppVersion) .image.distribution }}
+{{- else -}}
+{{- printf "%s:%s" .image.repository  (.image.tag | default .Chart.AppVersion) }}
 {{- end -}}
+{{- end -}}
+
 
 {{- define "ng-speech.historyPvc" -}}
 {{- printf "%s-history" (include "ng-speech.fullname" .) -}}
@@ -100,33 +105,6 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- printf "{\"auths\":{\"%s\":{\"username\":\"%s\",\"password\":\"%s\",\"email\":\"%s\",\"auth\":\"%s\"}}}" .domain .username .password .email (printf "%s:%s" .username .password | b64enc) | b64enc }}
 {{- end }}
 {{- end }}
-
-{{- define "ng-speech.etcd" -}}
-{{- printf "%s-etcd" (include "ng-speech.fullname" .) -}}
-{{- end -}}
-
-{{- define "ng-speech.etcdHeadlessService" -}}
-{{- printf "%s-etcd-headless" (include "ng-speech.fullname" .) -}}
-{{- end -}}
-
-{{- define "ng-speech.etcdEndpoint" }}
-{{- if .Values.etcd.enabled }}
-{{- printf "%s:2379" (include "ng-speech.etcd" .)  -}}
-{{- else if .Values.core.config.etcd.endpoint }}
-{{ .Values.core.config.etcd.endpoint }}
-{{- else }}
-localhost:2379
-{{- end }}
-{{- end }}
-
-{{- define "ng-speech.etcdPeers" -}}
-{{- $result := list -}}
-{{- $to := int .Values.etcd.replicaCount }}
-{{- range $i := until $to -}}
-{{- $result = (printf "%s-%d=http://%s-%d.%s.%v.svc.%s:2380" (include "ng-speech.etcd" $ ) $i (include "ng-speech.etcd" $ ) $i (include "ng-speech.etcdHeadlessService" $) $.Release.Namespace $.Values.clusterDomain)  | append $result -}}
-{{- end -}}
-{{ join "," $result }}
-{{- end -}}
 
 {{- define "ng-speech.traefikOptionalHostRule" -}}
 {{- if .Values.traefikIngressRoute.host }}

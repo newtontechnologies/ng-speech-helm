@@ -18,11 +18,6 @@ spec:
         - name: {{ include "ng-speech.core" . }}
           port: grpc
           scheme: h2c
-    - kind: Rule
-      match: {{ include "ng-speech.traefikOptionalHostRule" . }} PathPrefix(`/dashboard`)
-      services:
-        - name: {{ include "ng-speech.dashboard" . }}
-          port: http
   {{- if .Values.traefikIngressRoute.tls.secretName }}
   tls:
     secretName: {{ .Values.traefikIngressRoute.tls.secretName }}

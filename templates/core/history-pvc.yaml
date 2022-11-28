@@ -1,14 +1,14 @@
-{{- with .Values.core.config.sharedWorkspace.persistence }}
+{{- with .Values.core.config.history.persistence }}
 {{- if .enabled }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: "{{ include "ng-speech.workspacePvc" $ }}"
+  name: "{{ include "ng-speech.historyPvc" $ }}"
   annotations:
     helm.sh/resource-policy: "keep"
 spec:
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   resources:
     requests:
       storage: {{ .size }}
