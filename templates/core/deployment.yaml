@@ -44,7 +44,7 @@ spec:
       terminationGracePeriodSeconds: {{ .Values.core.terminationGracePeriodSeconds }}
       containers:
         - name: core
-          image: {{ include "ng-speech.coreImage" . }}
+          image: {{- printf "%s:%s" .Values.core.image.repository  (.Values.core.image | default .Chart.AppVersion) }}
           imagePullPolicy: {{ .Values.imagePullPolicy }}
           args:
             - core

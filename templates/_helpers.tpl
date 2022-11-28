@@ -64,29 +64,9 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- printf "%s-agent" (include "ng-speech.fullname" .) -}}
 {{- end -}}
 
-
 {{- define "ng-speech.agentCfg" -}}
 {{- printf "%s-agent" (include "ng-speech.fullname" .) -}}
 {{- end -}}
-
-{{- define "ng-speech.coreImage" -}}
-{{- with .Values.core.image }}
-{{- if .distribution }}
-{{- printf "%s:%s-%v" .repository  (.tag | default $.Chart.AppVersion) .distribution }}
-{{- else -}}
-{{- printf "%s:%s" .repository  (.tag | default $.Chart.AppVersion) }}
-{{- end -}}
-{{- end -}}
-{{- end -}}
-
-{{- define "ng-speech.agentImage" -}}
-{{- if .image.distribution }}
-{{- printf "%s:%s-%v" .image.repository  (.image.tag | default .Chart.AppVersion) .image.distribution }}
-{{- else -}}
-{{- printf "%s:%s" .image.repository  (.image.tag | default .Chart.AppVersion) }}
-{{- end -}}
-{{- end -}}
-
 
 {{- define "ng-speech.historyPvc" -}}
 {{- printf "%s-history" (include "ng-speech.fullname" .) -}}

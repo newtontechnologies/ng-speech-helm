@@ -19,7 +19,6 @@ core:
   image:
     repository: newtontechnologies/ng-core
     tag: ""
-    distribution: ""
   strategy:
     type: Recreate
   config:
@@ -92,7 +91,6 @@ agent:
     image:
       repository: newtontechnologies/ng-core
       tag: ""
-      distribution: ""
     updateStrategy:
       type: RollingUpdate
     config:
@@ -140,7 +138,6 @@ agent:
       periodSeconds: 10
       successThreshold: 1
       timeoutSeconds: 2
-
 
 serviceMonitor:
   enabled: false

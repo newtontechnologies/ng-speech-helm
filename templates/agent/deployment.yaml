@@ -52,9 +52,7 @@ spec:
       terminationGracePeriodSeconds: {{ $agent.terminationGracePeriodSeconds }}
       containers:
         - name: agent
-          {{ $ctx := dict "image" ($agent.image | default dict ) }}
-          {{ $ctx = merge $ctx $ }}
-          image: {{ include "ng-speech.agentImage" $ctx }}
+          image: {{- printf "%s:%s" $agent.image.repository  ($agent.image.tag | default $.Chart.AppVersion) }}
           imagePullPolicy: {{ $.Values.imagePullPolicy }}
           ports:
             - name: monitor
