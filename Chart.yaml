@@ -3,7 +3,7 @@ name: ng-speech
 description: Newton Technologies Speech Services
 type: application
 version: 2.0.0-beta
-appVersion: 2.0.0-1e73fb8-221123065824
+appVersion: 2.0.0-da76b9f-221128074712
 icon: https://www.newtontech.net/wp-content/uploads/2022/06/nt-ico-rgb.png
 dependencies:
   - name: common

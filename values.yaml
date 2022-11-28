@@ -74,52 +74,48 @@ core:
   tolerations: [ ]
   terminationGracePeriodSeconds: 600
 
-
 agent:
-  image:
-    repository: newtontechnologies/ng-core
-    tag: ""
-    distribution: ""
-  updateStrategy:
-    type: RollingUpdate
-  config:
-    sharedWorkspace:
-      enabled: false
-      dir: /var/lib/ng/shared-workspace
-  args: [ ]
-  extraEnvVars: [ ]
-  extraEnvFrom: [ ]
-  terminationGracePeriodSeconds: 600
-  podLabels: { }
-  podAnnotations: { }
-  resources:
-    requests:
-      cpu: 1
-      memory: 3Gi
-  affinity: { }
-  ## Allowed values: `soft` or `hard`
-  podAffinityPreset: ""
-  ## Allowed values: `soft` or `hard`
-  podAntiAffinityPreset: soft
-  nodeAffinityPreset:
-    ## Allowed values: `soft` or `hard`
-    type: ""
-    key: ""
-    values: [ ]
-  nodeSelector: { }
-  priorityClassName: ""
-  schedulerName: ""
-  automountServiceAccountToken: false
-  tolerations: [ ]
-  pdb:
-    enabled: true
-    minAvailable: ""
-    maxUnavailable: "25%"
-
-# agents
-agents:
   default:
-    count: 0
+    count: 3
+    image:
+      repository: newtontechnologies/ng-core
+      tag: ""
+      distribution: ""
+    updateStrategy:
+      type: RollingUpdate
+    config:
+      sharedWorkspace:
+        enabled: false
+        dir: /var/lib/ng/shared-workspace
+    args: [ ]
+    extraEnvVars: [ ]
+    extraEnvFrom: [ ]
+    terminationGracePeriodSeconds: 600
+    podLabels: { }
+    podAnnotations: { }
+    resources:
+      requests:
+        cpu: 1
+        memory: 3Gi
+    affinity: { }
+    ## Allowed values: `soft` or `hard`
+    podAffinityPreset: ""
+    ## Allowed values: `soft` or `hard`
+    podAntiAffinityPreset: soft
+    nodeAffinityPreset:
+      ## Allowed values: `soft` or `hard`
+      type: ""
+      key: ""
+      values: [ ]
+    nodeSelector: { }
+    priorityClassName: ""
+    schedulerName: ""
+    automountServiceAccountToken: false
+    tolerations: [ ]
+    pdb:
+      enabled: true
+      minAvailable: ""
+      maxUnavailable: "25%"
 
 
 serviceMonitor:

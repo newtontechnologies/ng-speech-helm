@@ -1,12 +1,15 @@
-{{- range $name, $agent := .Values.agents }}
+{{- range $name, $agent := .Values.agent }}
 {{- if (gt (int $agent.count)  0) }}
 
-{{ $agent = (mustMergeOverwrite (deepCopy $.Values.agent) $agent ) }}
+{{- if (ne $name "default") }}
+{{ $agent = (mustMergeOverwrite (deepCopy $.Values.agent.default) $agent ) }}
+{{- end }}
+
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{  printf "%s-%s-abc" (include "ng-speech.agent" $) $name }}
+  name: {{  printf "%s-%s" (include "ng-speech.agent" $) $name }}
   labels:
     {{- include "ng-speech.labels" $ | nindent 4 }}
     component: {{ include "ng-speech.agent" $ }}
@@ -75,6 +78,8 @@ spec:
             {{ toYaml $agent.extraEnvFrom | nindent 12 }}
             {{- end }}
           env:
+            - name: NG_GRACEFUL_SHUTDOWN_TIMEOUT
+              value: "{{ $agent.terminationGracePeriodSeconds }}s"
             - name: NG_NODE
               valueFrom:
                 fieldRef:
