@@ -4,6 +4,8 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: "{{ include "ng-speech.historyPvc" $ }}"
+  annotations:
+    helm.sh/resource-policy: "keep"
 spec:
   accessModes:
     - ReadWriteOnce

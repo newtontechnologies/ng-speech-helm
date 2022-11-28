@@ -64,3 +64,10 @@ List of selected configuration options
 | `agent.replicaCount`                  | Number of agent replicas. Each agent can handle single request at a time               | `1`              |
 | `traefikIngressRoute.enabled`         | Install Traefik IngressRoute for ingress traffic                                       | `true`           |
 
+
+
+## Packaging
+```bash
+helm package .
+helm push ng-speech-$version.tgz oci://registry-1.docker.io/newtontechnologies
+```

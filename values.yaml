@@ -21,7 +21,7 @@ core:
     tag: ""
     distribution: ""
   updateStrategy:
-    type: RollingUpdate
+    type: Recreate
   config:
     license:
       token: ""
