@@ -31,9 +31,9 @@ spec:
         {{- include "common.tplvalues.render" (dict "value" .Values.core.podLabels "context" $) | nindent 8 }}
         {{- end }}
     spec:
-      {{- if (or .Values.imagePullSecret.enabled .Values.global.imagePullSecrets) }}
+      {{- if (or .Values.imagePullSecret.username .Values.global.imagePullSecrets) }}
       imagePullSecrets:
-      {{- if .Values.imagePullSecret.enabled }}
+      {{- if .Values.imagePullSecret.username }}
         - name: {{ include "ng-speech.imagePullSecret" .}}
       {{- end }}
       {{- if .Values.global.imagePullSecrets }}
@@ -44,7 +44,7 @@ spec:
       terminationGracePeriodSeconds: {{ .Values.core.terminationGracePeriodSeconds }}
       containers:
         - name: core
-          image: {{- printf "%s:%s" .Values.core.image.repository  (.Values.core.image | default .Chart.AppVersion) }}
+          image: {{ printf "%s:%s" .Values.core.image.repository  (.Values.core.image.tag | default .Chart.AppVersion) }}
           imagePullPolicy: {{ .Values.imagePullPolicy }}
           args:
             - core

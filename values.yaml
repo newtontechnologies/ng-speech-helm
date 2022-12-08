@@ -9,7 +9,6 @@ global:
   imagePullSecrets: [ ]
 
 imagePullSecret:
-  enabled: false
   domain: docker.io
   username: ""
   password: ""

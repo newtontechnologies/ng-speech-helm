@@ -39,9 +39,9 @@ spec:
         {{- include "common.tplvalues.render" (dict "value" $agent.podLabels "context" $) | nindent 8 }}
         {{- end }}
     spec:
-      {{- if (or $.Values.imagePullSecret.enabled $.Values.global.imagePullSecrets) }}
+      {{- if (or $.Values.imagePullSecret.username $.Values.global.imagePullSecrets) }}
       imagePullSecrets:
-      {{- if $.Values.imagePullSecret.enabled }}
+      {{- if $.Values.imagePullSecret.username }}
         - name: {{ include "ng-speech.imagePullSecret" $ }}
       {{- end }}
       {{- if $.Values.global.imagePullSecrets }}
@@ -52,7 +52,7 @@ spec:
       terminationGracePeriodSeconds: {{ $agent.terminationGracePeriodSeconds }}
       containers:
         - name: agent
-          image: {{- printf "%s:%s" $agent.image.repository  ($agent.image.tag | default $.Chart.AppVersion) }}
+          image: {{ printf "%s:%s" $agent.image.repository  ($agent.image.tag | default $.Chart.AppVersion) }}
           imagePullPolicy: {{ $.Values.imagePullPolicy }}
           ports:
             - name: monitor
