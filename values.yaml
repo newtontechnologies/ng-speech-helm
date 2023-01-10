@@ -18,7 +18,7 @@ core:
   image:
     repository: newtontechnologies/ng-core
     tag: ""
-  strategy:
+  updateStrategy:
     type: Recreate
   config:
     license:
