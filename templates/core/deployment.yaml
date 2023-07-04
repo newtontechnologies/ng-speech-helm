@@ -21,9 +21,6 @@ spec:
         {{- include "common.tplvalues.render" (dict "value" .Values.core.podAnnotations "context" $) | nindent 8 }}
       {{- end }}
         checksum/core-secret: {{ include (print $.Template.BasePath "/core/secret.yaml") . | sha256sum }}
-      {{- if .Values.core.config.users }}
-        checksum/users-secret: {{ include (print $.Template.BasePath "/core/users-secret.yaml") . | sha256sum }}
-      {{- end }}
       labels:
         {{- include "ng-speech.selectorLabels" . | nindent 8 }}
         component: core
@@ -63,6 +60,9 @@ spec:
           envFrom:
             - secretRef:
                 name: {{ include "ng-speech.coreCfg" .}}
+            {{- if .Values.core.extraEnvFrom }}
+            {{ toYaml .Values.core.extraEnvFrom | nindent 12 }}
+            {{- end }}
           env:
           {{- with .Values.core.extraEnvVars }}
             {{- toYaml . | nindent 12 }}

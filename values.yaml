@@ -23,16 +23,17 @@ core:
   config:
     license:
       token: ""
+      tokenSecret: ""
     login:
       jwt:
         key: ""
         audience: ""
         ttl: "4h"
       admin:
-        username: ngadmin
-        password: ngadmin
+        username: ""
+        password: ""
     agent:
-      token: ""
+      token: "insecure-token"
       # number of embedded agents
       count: 0
     users: [ ]
@@ -56,6 +57,7 @@ core:
         size: 10Gi
   args: [ ]
   extraEnvVars: [ ]
+  extraEnvFrom: [ ]
   podLabels: { }
   podAnnotations: { }
   resources: { }
