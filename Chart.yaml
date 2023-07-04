@@ -2,7 +2,7 @@ apiVersion: v2
 name: ng-speech
 description: Newton Technologies Speech Services
 type: application
-version: 2.0.14
+version: 2.0.15
 appVersion: 2.0.8
 icon: https://www.newtontech.net/wp-content/uploads/2022/06/nt-ico-rgb.png
 dependencies:
